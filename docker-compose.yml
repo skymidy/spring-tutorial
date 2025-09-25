@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    container_name: tutorial_postgres
+    environment:
+      POSTGRES_DB: tutorial_db
+      POSTGRES_USER: tutorial_user
+      POSTGRES_PASSWORD: tutorial_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tutorial_user -d tutorial_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+#    networks:
+#      - tutorial_network
+
+  redis:
+    image: redis:7.4.1-alpine # Use a specific, stable version
+    container_name: tutorial_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--bind", "0.0.0.0", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+#    networks:
+#      - tutorial_network
+
+  app:
+    image: tutorial_boot:latest
+    depends_on:
+      postgres:   # Wait for Postgres to be healthy
+        condition: service_healthy
+      redis:      # Wait for Redis to be healthy
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tutorial_db
+      SPRING_DATASOURCE_USERNAME: tutorial_user
+      SPRING_DATASOURCE_PASSWORD: tutorial_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+    ports:
+      - "8080:8080"
+#    networks:
+#      - tutorial_network
+    # --- Add Healthcheck for the App ---
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      # Alternative using curl (if preferred and available):
+      # test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s # Give the app more time to start initially
+
+# Define the volume(s)
+volumes:
+  postgres_data:
+  redis_data:
+
+# Define the network(s)
+#networks:
+#  tutorial_network:
+#    external: true
+#    driver: bridge
