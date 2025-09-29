@@ -20,6 +20,7 @@ public class User {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("DEFAULT")
     private UserRoleEnum role;
 
     @ColumnDefault("0")
