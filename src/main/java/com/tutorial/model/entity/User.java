@@ -7,7 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class User {
 
     @Id
-    private Long id;
+    private long id;
 
     @Column(unique = true, nullable = false)
     private String username;
