@@ -1,4 +1,4 @@
-package com.tutorial.dto;
+package com.tutorial.model.dto;
 
 import lombok.Data;
 import java.time.OffsetDateTime;
