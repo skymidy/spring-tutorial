@@ -16,12 +16,12 @@ public class UserRole {
     private Integer id;
 
     @NonNull
-    @Column(nullable = false, unique = true, length = 255)
-    @ColumnDefault("'USER'")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    private UserRoleEnum name = UserRoleEnum.DEFAULT;
 
     @NonNull
-    @Column(nullable = false)
+    @Column(name = "is_admin", nullable = false)
     @ColumnDefault("false")
     private Boolean isAdmin = false;
 
