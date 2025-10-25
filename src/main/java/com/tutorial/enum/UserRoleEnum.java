@@ -1,4 +1,4 @@
-package com.tutorial.model.entity;
+package com.tutorial.Enum;
 
 public enum UserRoleEnum {
     DEFAULT,

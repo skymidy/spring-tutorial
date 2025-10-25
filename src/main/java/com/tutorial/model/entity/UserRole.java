@@ -2,6 +2,8 @@ package com.tutorial.model.entity;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.tutorial.Enum.UserRoleEnum;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NonNull;
