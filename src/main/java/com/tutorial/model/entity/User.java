@@ -39,7 +39,7 @@ public class User {
 
     @Column
     @ColumnDefault("0")
-    private Long rateLimit;
+    private Long rateLimit = 0L;
 
     @Column(nullable = false)
     @ColumnDefault("true")
