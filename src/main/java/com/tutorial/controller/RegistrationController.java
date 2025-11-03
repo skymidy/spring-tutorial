@@ -4,7 +4,6 @@ import com.tutorial.model.dto.RegistrationRequest;
 import com.tutorial.service.RegistrationService;
 import com.tutorial.service.RegistrationService.RegistrationResult;
 
-import org.springframework.context.annotation.Role;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
