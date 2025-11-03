@@ -37,6 +37,10 @@ public class User {
     @JoinColumn(name = "username", referencedColumnName = "username")
     private Set<Authority> authorities;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private Set<ApiResource> apiResources;
+
     @Column
     @ColumnDefault("0")
     private Long rateLimit = 0L;
