@@ -1,7 +1,9 @@
 package com.tutorial.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.time.OffsetDateTime;
@@ -10,6 +12,8 @@ import java.time.ZoneOffset;
 @Data
 @Entity
 @Table(name = "request_logs")
+@NoArgsConstructor
+@AllArgsConstructor
 public class RequestLog {
 
     @Id

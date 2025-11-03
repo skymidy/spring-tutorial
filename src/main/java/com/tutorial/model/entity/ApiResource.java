@@ -4,11 +4,15 @@ import org.hibernate.annotations.ColumnDefault;
 
 import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "api_resources")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResource {
 
     @Id

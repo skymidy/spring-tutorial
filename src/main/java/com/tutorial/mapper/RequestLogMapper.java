@@ -1,8 +1,9 @@
 package com.tutorial.mapper;
 
 import org.mapstruct.*;
+
+import com.tutorial.model.dto.RequestLogDto;
 import com.tutorial.model.entity.RequestLog;
-import com.tutorial.dto.RequestLogDto;
 
 @Mapper(componentModel = "spring")
 public interface RequestLogMapper {
