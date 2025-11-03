@@ -16,5 +16,7 @@ public interface ApiResourceRepository extends Repository<ApiResource, Integer> 
 
     List<ApiResource> findByOwner_Username(String username);
 
+    Optional<ApiResource> findByNameAndIsEnabledTrue(String name);
+
     void deleteById(Integer id);
 }
