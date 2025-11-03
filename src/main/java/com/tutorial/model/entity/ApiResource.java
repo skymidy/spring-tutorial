@@ -32,6 +32,10 @@ public class ApiResource {
     @Column(nullable = false, length = 255)
     private String baseUrl;
 
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
+
     @Column(nullable = false)
     @ColumnDefault("true")
     private Boolean isEnabled = true;
