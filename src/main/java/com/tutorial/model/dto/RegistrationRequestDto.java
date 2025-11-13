@@ -3,7 +3,7 @@ package com.tutorial.model.dto;
 import lombok.Data;
 
 @Data
-public class RegistrationRequest {
+public class RegistrationRequestDto {
   private String username;
   private String password;
 }

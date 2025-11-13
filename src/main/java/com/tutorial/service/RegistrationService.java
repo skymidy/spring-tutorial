@@ -1,70 +1,54 @@
 package com.tutorial.service;
 
 import com.tutorial.Enum.AuthorityEnum;
-import com.tutorial.model.dto.RegistrationRequest;
-import com.tutorial.model.entity.Authority;
+import com.tutorial.Enum.ErrorCodesEnum;
+import com.tutorial.exceptions.RegistrationServiceException;
+import com.tutorial.mapper.UserMapper;
+import com.tutorial.model.dto.RegistrationRequestDto;
+import com.tutorial.model.dto.UserDto;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.AuthorityRepository;
 import com.tutorial.repository.UserRepository;
 
-import lombok.Data;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RegistrationService {
 
-  private final UserRepository userRepository;
-  private final AuthorityRepository authorityRepository;
-  private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
-  public RegistrationService(UserRepository userRepository, AuthorityRepository authorityRepository,
-      PasswordEncoder passwordEncoder) {
-    this.userRepository = userRepository;
-    this.authorityRepository = authorityRepository;
-    this.passwordEncoder = passwordEncoder;
-  }
-
-  public RegistrationResult register(RegistrationRequest req) {
-    if (req.getUsername() == null || req.getPassword() == null) {
-      return RegistrationResult.failure("username and password are required");
-    }
-    if (userRepository.findByUsername(req.getUsername()).isPresent()) {
-      return RegistrationResult.failure("username already exists");
+    public RegistrationService(UserRepository userRepository, AuthorityRepository authorityRepository,
+                               PasswordEncoder passwordEncoder, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.authorityRepository = authorityRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
-    User u = new User();
-    u.setUsername(req.getUsername());
-    u.setPassword(passwordEncoder.encode(req.getPassword()));
+    @Transactional
+    public UserDto register(RegistrationRequestDto req) throws RegistrationServiceException {
+        if (req.getUsername() == null) {
+            throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_EMPTY, ErrorCodesEnum.USERNAME_EMPTY.getMessage());
+        }
+        if (req.getPassword() == null) {
+            throw new RegistrationServiceException(ErrorCodesEnum.PASSWORD_EMPTY, ErrorCodesEnum.PASSWORD_EMPTY.getMessage());
+        }
+        if (userRepository.findByUsername(req.getUsername()).isPresent()) {
+            throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_ALREADY_EXISTS, ErrorCodesEnum.USERNAME_ALREADY_EXISTS.getMessage());
+        }
 
-    User saved = userRepository.save(u);
+        User u = new User(req.getUsername(), passwordEncoder.encode(req.getPassword()));
 
-    Authority auth = new Authority();
-    auth.setUsername(saved.getUsername());
-    auth.setAuthority(AuthorityEnum.USER);
-    authorityRepository.save(auth);
+        User saved = userRepository.save(u);
 
-    return RegistrationResult.success(new Payload(saved.getUsername(), saved.getApiKey()));
-  }
+        authorityRepository.addAuthorityToUser(saved.getUsername(), AuthorityEnum.USER);
 
-  @Data
-  public static class Payload {
-    private final String username;
-    private final String apiKey;
-  }
-
-  @Data
-  public static class RegistrationResult {
-    private final boolean success;
-    private final String message;
-    private final Payload payload;
-
-    public static RegistrationResult success(Payload p) {
-      return new RegistrationResult(true, null, p);
+        return userMapper.toDto(saved);
     }
 
-    public static RegistrationResult failure(String msg) {
-      return new RegistrationResult(false, msg, null);
-    }
-  }
 }

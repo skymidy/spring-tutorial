@@ -1,28 +1,25 @@
 package com.tutorial.controller;
 
-import com.tutorial.model.dto.RegistrationRequest;
+import com.tutorial.model.dto.RegistrationRequestDto;
+import com.tutorial.model.dto.UserDto;
 import com.tutorial.service.RegistrationService;
-import com.tutorial.service.RegistrationService.RegistrationResult;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class RegistrationController {
 
-  private final RegistrationService registrationService;
+    private final RegistrationService registrationService;
 
-  public RegistrationController(RegistrationService registrationService) {
-    this.registrationService = registrationService;
-  }
-
-  @PostMapping("/register")
-  public ResponseEntity<?> register(@RequestBody RegistrationRequest req) {
-    RegistrationResult result = registrationService.register(req);
-    if (!result.isSuccess()) {
-      return ResponseEntity.badRequest().body(result.getMessage());
+    public RegistrationController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
     }
-    return ResponseEntity.status(201).body(result.getPayload());
-  }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/register")
+    public UserDto register(@RequestBody RegistrationRequestDto req) {
+        return registrationService.register(req);
+    }
 }
