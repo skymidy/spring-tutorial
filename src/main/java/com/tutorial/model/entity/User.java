@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class User {
 
     @Id
@@ -29,7 +31,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @NonNull
     @Column(unique = true, length = 255)
     private String apiKey;
 
