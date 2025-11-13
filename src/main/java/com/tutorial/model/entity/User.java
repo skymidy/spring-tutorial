@@ -37,13 +37,12 @@ public class User {
     @JoinColumn(name = "username", referencedColumnName = "username")
     private Set<Authority> authorities;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "owner")
     private Set<ApiResource> apiResources;
 
     @Column
     @ColumnDefault("0")
-    private Long rateLimit = 0L;
+    private Long rateLimit = 0L; //TODO: Кол-во запросов в секунду задаёт администратор (WebFlux)
 
     @Column(nullable = false)
     @ColumnDefault("true")
