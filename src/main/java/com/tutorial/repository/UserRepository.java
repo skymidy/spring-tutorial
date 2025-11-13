@@ -19,4 +19,6 @@ public interface UserRepository extends Repository<User, Long> {
     Optional<User> findByUsernameWithAuthorities(@Param("username") String username);
 
     boolean existsByApiKey(String apiKey);
+
+    Optional<User> findByApiKey(String apiKey);
 }
