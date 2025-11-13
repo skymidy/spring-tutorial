@@ -17,4 +17,6 @@ public interface UserRepository extends Repository<User, Long> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.authorities WHERE u.username = :username")
     Optional<User> findByUsernameWithAuthorities(@Param("username") String username);
+
+    boolean existsByApiKey(String apiKey);
 }
