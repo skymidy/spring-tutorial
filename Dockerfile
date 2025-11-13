@@ -1,41 +1,60 @@
-# --- Stage 1: Build the application ---
-FROM maven:3.9.9-amazoncorretto-21 AS build
+# --- Stage 1: Deps
+FROM maven:3.9.9-amazoncorretto-21 AS deps
+WORKDIR /build
+COPY --chmod=0755 mvnw mvnw
+COPY .mvn/ .mvn/
+RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+    --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline -DskipTests
 
-# Set the working directory inside the container
-WORKDIR /app
+# --- Stage 2: Build
+FROM deps as package
+WORKDIR /build
+COPY ./src src/
+RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+    --mount=type=cache,target=/root/.m2 \
+    ./mvnw package -DskipTests && \
+    mv target/$(./mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout)-$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout).jar target/app.jar
 
-# Copy the pom.xml file first to leverage Docker layer caching for dependencies
-COPY pom.xml .
+# --- Stage 3: Layering(???)
+################################################################################
+# Create a stage for extracting the application into separate layers.
+# Take advantage of Spring Boot's layer tools and Docker's caching by extracting
+# the packaged application into separate layers that can be copied into the final stage.
+# See Spring's docs for reference:
+# https://docs.spring.io/spring-boot/docs/current/reference/html/container-images.html
+FROM package as extract
+WORKDIR /build
+RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/extracted
 
-# Download dependencies (this layer will be cached if pom.xml doesn't change)
-RUN mvn dependency:go-offline -B
+# --- Stage 4.1: Dev stage
+FROM extract as development
+WORKDIR /build
+RUN cp -r /build/target/extracted/dependencies/. ./
+RUN cp -r /build/target/extracted/spring-boot-loader/. ./
+RUN cp -r /build/target/extracted/snapshot-dependencies/. ./
+RUN cp -r /build/target/extracted/application/. ./
+ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
+CMD [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
 
-# Copy the source code
-COPY src ./src
-
-# Build the application package (JAR)
-# Assuming your Spring Boot plugin creates an executable JAR named boot-0.0.1-SNAPSHOT.jar
-# based on your artifactId and version. Adjust if your final JAR name differs.
-RUN mvn clean package -DskipTests
-
-
-# --- Stage 2: Create the runtime image ---
+# --- Stage 4.2: Runtime
 FROM amazoncorretto:21-alpine AS runtime
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    appuser
+USER appuser
 
-# Create a non-root user for better security
-RUN addgroup -g 1001 -S spring &&\
-    adduser -u 1001 -S spring -G spring
-USER spring:spring
+# Copy the executable from the "package" stage.
+COPY --from=extract build/target/extracted/dependencies/ ./
+COPY --from=extract build/target/extracted/spring-boot-loader/ ./
+COPY --from=extract build/target/extracted/snapshot-dependencies/ ./
+COPY --from=extract build/target/extracted/application/ ./
 
-# Set the working directory
-WORKDIR /app
-
-# Copy the JAR file from the build stage
-# Adjust the JAR name if necessary (check your target/ directory after build)
-COPY --from=build --chown=spring:spring /app/target/boot-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the port of Spring Boot application
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]
