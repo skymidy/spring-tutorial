@@ -35,10 +35,10 @@ public class ApiResourceService {
     String username = currentUsername();
     User owner = userRepository.findByUsername(username).orElseThrow(() -> new IllegalStateException("user not found"));
     ApiResource r = new ApiResource();
-    r.setAuthenticationType(null); // caller must set or we can map later
+    r.setAuthenticationType(null);
     r.setName(dto.getName());
     r.setBaseUrl(dto.getBaseUrl());
-    r.setIsEnabled(dto.getIsEnabled() == null ? true : dto.getIsEnabled());
+    r.setIsEnabled(dto.getIsEnabled() == null || dto.getIsEnabled());
     r.setApiKey(dto.getApiKey());
     r.setOwner(owner);
     return apiResourceRepository.save(r);
@@ -76,7 +76,7 @@ public class ApiResourceService {
   public void delete(Integer id) {
     ApiResource existing = apiResourceRepository.findById(id).orElseThrow(() -> new IllegalStateException("not found"));
     String username = currentUsername();
-    if (!isAdmin(username) && !existing.getOwner().getUsername().equals(username)) {
+    if (!isAllowed(existing, username)) {
       throw new SecurityException("forbidden");
     }
     apiResourceRepository.deleteById(id);
@@ -86,5 +86,9 @@ public class ApiResourceService {
     if (username == null)
       return false;
     return authorityRepository.findByUsername(username).map(a -> a.getAuthority().name().equals("ADMIN")).orElse(false);
+  }
+
+  private boolean isAllowed(ApiResource resource, String username) {
+    return isAdmin(username) || resource.getOwner().getUsername().equals(username);
   }
 }

@@ -47,7 +47,7 @@ public class ProxyController {
             HttpServletRequest request) {
 
         String remaining = extractRemainingPath(request);
-        ApiResource resource = proxyService.getEnabledResourceByAlias(apiAlias);
+        ApiResource resource = proxyService.getResourceByAlias(apiAlias);
         String targetUrl = proxyService.buildTargetUrl(resource, remaining, request.getQueryString());
 
         HttpHeaders headers = extractRequestHeaders(request);

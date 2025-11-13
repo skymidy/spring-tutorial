@@ -14,13 +14,13 @@ public class ProxyService {
         this.apiResourceRepository = apiResourceRepository;
     }
 
-    public ApiResource getEnabledResourceByAlias(String alias) {
+    public ApiResource getResourceByAlias(String alias) {
         return apiResourceRepository.findByNameAndIsEnabledTrue(alias)
                 .orElseThrow(() -> new IllegalArgumentException("API resource not found or disabled"));
     }
 
     public String buildTargetUrl(ApiResource resource, String remainingPath, String queryString) {
-        String sanitizedBase = stripTraПilingSlash(resource.getBaseUrl());
+        String sanitizedBase = stripTrailingSlash(resource.getBaseUrl());
         String sanitizedPath = stripLeadingSlash(remainingPath == null ? "" : remainingPath);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(sanitizedBase);
