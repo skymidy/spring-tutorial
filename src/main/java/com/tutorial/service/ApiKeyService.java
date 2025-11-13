@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.tutorial.mapper.UserMapper;
 import com.tutorial.model.dto.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
