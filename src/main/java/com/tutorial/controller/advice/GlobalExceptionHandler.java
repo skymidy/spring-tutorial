@@ -1,4 +1,4 @@
-package com.tutorial.service;
+package com.tutorial.controller.advice;
 
 import com.tutorial.exceptions.AuthorityServiceException;
 import com.tutorial.exceptions.RegistrationServiceException;
