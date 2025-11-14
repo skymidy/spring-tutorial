@@ -33,7 +33,6 @@ services:
   app:
     build:
       context: .
-      target: development
       tags: 
       - "tutorial_boot:latest"
     develop:
