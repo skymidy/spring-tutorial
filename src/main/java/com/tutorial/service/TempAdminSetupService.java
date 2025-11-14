@@ -5,7 +5,6 @@ import com.tutorial.configs.AdminProperties;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.AuthorityRepository;
 import com.tutorial.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
