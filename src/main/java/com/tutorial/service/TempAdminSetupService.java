@@ -46,7 +46,7 @@ public class TempAdminSetupService {
                 createUser();
             } else {
                 //TODO: Throw error to global handler
-                log.info("Temporary admin user already exists: {}", adminProperties.getUsername());
+                log.info("Temporary admin user already exists: {}", existingUser.get().getUsername());
             }
         }
     }
