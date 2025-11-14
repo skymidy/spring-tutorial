@@ -18,10 +18,10 @@ import java.util.Optional;
 @Slf4j
 public class TempAdminSetupService {
 
-    private UserRepository userRepository;
-    private AuthorityRepository authorityRepository;
-    private PasswordEncoder passwordEncoder;
-    private AdminProperties adminProperties;
+    private final UserRepository userRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AdminProperties adminProperties;
 
     public TempAdminSetupService(UserRepository userRepository,
                                  AuthorityRepository authorityRepository,
