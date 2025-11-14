@@ -10,7 +10,9 @@ public enum ErrorCodesEnum {
     USERNAME_EMPTY(400, "Username cannot be empty"),
     PASSWORD_EMPTY(400, "Password cannot be empty"),
     UNACCEPTABLE_USERNAME(400, "Username does not meet requirements"),
-    UNACCEPTABLE_PASSWORD(400, "Password does not meet requirements");
+    UNACCEPTABLE_PASSWORD(400, "Password does not meet requirements"),
+    UNACCEPTABLE_AUTHORITY(400, "Authority does not meet requirements"),
+    DB_ERROR(500, "Database error occurred");
 
     private final int httpStatusCode;
     private final String message;
