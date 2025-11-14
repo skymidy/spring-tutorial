@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AuthorityRepository extends Repository<Authority, AuthorityId> {
@@ -17,17 +18,20 @@ public interface AuthorityRepository extends Repository<Authority, AuthorityId> 
 
     Optional<Authority> findByUsername(String username);
 
+    @Query("SELECT authority FROM Authority WHERE username = :username")
+    List<String> findAllByUsername(@Param("username") String username);
+
     Optional<Authority> findByAuthority(String authority);
 
     @Modifying
     @Query("INSERT INTO Authority (username, authority) VALUES (:username, :authority)")
-    void addAuthorityToUser(@Param("username") String username, @Param("authority") AuthorityEnum authority);
+    int addAuthorityToUser(@Param("username") String username, @Param("authority") AuthorityEnum authority);
 
     @Modifying
     @Query("DELETE FROM Authority WHERE username = :username AND authority = :authority")
-    void removeAuthorityFromUser(@Param("username") String username, @Param("authority") AuthorityEnum authority);
+    int removeAuthorityFromUser(@Param("username") String username, @Param("authority") AuthorityEnum authority);
 
     @Modifying
     @Query("DELETE FROM Authority WHERE username = :username")
-    void removeAllAuthoritiesFromUser(@Param("username") String username);
+    int removeAllAuthoritiesFromUser(@Param("username") String username);
 }
