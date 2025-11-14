@@ -54,7 +54,7 @@ public class TempAdminSetupService {
     @Transactional
     private void createUser() {
 
-        User tempAdmin = new User(adminProperties.getUsername(), adminProperties.getPassword());
+        User tempAdmin = new User(adminProperties.getUsername(), passwordEncoder.encode(adminProperties.getPassword()));
 
         userRepository.save(tempAdmin);
 
