@@ -1,5 +1,6 @@
 package com.tutorial.controller.advice;
 
+import com.tutorial.exceptions.ApiKeyServiceException;
 import com.tutorial.exceptions.AuthorityServiceException;
 import com.tutorial.exceptions.BaseServiceException;
 import com.tutorial.exceptions.RegistrationServiceException;
@@ -21,10 +22,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchRegistrationServiceException(AuthorityServiceException e) {
-        return genericResponse(e,"AuthorityServiceException Exception! Code: {}, Message: {}");
+        return genericResponse(e,"AuthorityService Exception! Code: {}, Message: {}");
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(ApiKeyServiceException e) {
+        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
     }
 
-    private static ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e,String messageTemplate) {
+    private ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e,String messageTemplate) {
         HttpStatus status = e.getCode().getHttpStatus();
         String message = e.getMessage();
         log.error("RegistrationServiceException status: {}, message: {}", status, message, e);

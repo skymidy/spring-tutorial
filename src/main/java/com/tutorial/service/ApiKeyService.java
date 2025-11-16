@@ -3,6 +3,8 @@ package com.tutorial.service;
 import java.security.SecureRandom;
 import java.util.Optional;
 
+import com.tutorial.Enum.ErrorCodesEnum;
+import com.tutorial.exceptions.ApiKeyServiceException;
 import com.tutorial.mapper.UserMapper;
 import com.tutorial.model.dto.UserDto;
 import org.springframework.stereotype.Service;
@@ -30,32 +32,6 @@ public class ApiKeyService {
 
     }
 
-    public String generateUniqueApiKey() {
-        int maxAttempts = 100; // Reasonable limit to prevent infinite loop
-
-        for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            String apiKey = generateApiKey();
-
-            if (!userRepository.existsByApiKey(apiKey)) {
-                return apiKey;
-            }
-        }
-
-        //TODO: APIKeyService Custom Exception Class
-        throw new RuntimeException("Failed to generate unique API key after " + maxAttempts + " attempts");
-    }
-
-    private String generateApiKey() {
-        StringBuilder sb = new StringBuilder(API_KEY_LENGTH);
-
-        for (int i = 0; i < API_KEY_LENGTH; i++) {
-            sb.append(CHARACTERS.charAt(SECURE_RANDOM.nextInt(CHARACTERS.length())));
-        }
-
-        return sb.toString();
-    }
-
-
     public String generateApiKeyForUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
@@ -79,12 +55,35 @@ public class ApiKeyService {
         return newApiKey;
     }
 
-
     public boolean validateApiKey(String apiKey) {
         return userRepository.findByApiKey(apiKey).isPresent();
     }
 
     public Optional<UserDto> getUserByApiKey(String apiKey) {
         return userRepository.findByApiKey(apiKey).map(userMapper::toDto);
+    }
+
+    private String generateUniqueApiKey() {
+        int maxAttempts = 100; // Reasonable limit to prevent infinite loop
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            String apiKey = generateApiKey();
+
+            if (!userRepository.existsByApiKey(apiKey)) {
+                return apiKey;
+            }
+        }
+
+        throw new ApiKeyServiceException(ErrorCodesEnum.UNLUCKY_ERROR,"Failed to generate unique API key after " + maxAttempts + " attempts");
+    }
+
+    private String generateApiKey() {
+        StringBuilder sb = new StringBuilder(API_KEY_LENGTH);
+
+        for (int i = 0; i < API_KEY_LENGTH; i++) {
+            sb.append(CHARACTERS.charAt(SECURE_RANDOM.nextInt(CHARACTERS.length())));
+        }
+
+        return sb.toString();
     }
 }
