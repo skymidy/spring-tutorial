@@ -1,9 +1,7 @@
 package com.tutorial.exceptions;
 
 import com.tutorial.Enum.ErrorCodesEnum;
-import lombok.Getter;
 
-@Getter
 public class AuthorityServiceException extends BaseServiceException {
 
     public AuthorityServiceException(ErrorCodesEnum code, String message) {
