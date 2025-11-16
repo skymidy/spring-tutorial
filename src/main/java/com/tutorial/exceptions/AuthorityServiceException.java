@@ -4,10 +4,12 @@ import com.tutorial.Enum.ErrorCodesEnum;
 import lombok.Getter;
 
 @Getter
-public class AuthorityServiceException extends RuntimeException {
-    private final ErrorCodesEnum code;
+public class AuthorityServiceException extends BaseServiceException {
+
     public AuthorityServiceException(ErrorCodesEnum code, String message) {
-        super(message);
-        this.code = code;
+        super(code,message);
+    }
+    public AuthorityServiceException(ErrorCodesEnum code) {
+        super(code);
     }
 }

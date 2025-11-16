@@ -31,13 +31,10 @@ public class RegistrationService {
     }
 
     @Transactional
-    public UserDto register(RegistrationRequestDto req) throws RegistrationServiceException {
-        if (req.getUsername() == null) {
-            throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_EMPTY, ErrorCodesEnum.USERNAME_EMPTY.getMessage());
-        }
-        if (req.getPassword() == null) {
-            throw new RegistrationServiceException(ErrorCodesEnum.PASSWORD_EMPTY, ErrorCodesEnum.PASSWORD_EMPTY.getMessage());
-        }
+    public UserDto register(RegistrationRequestDto req) {
+
+        validateRegistrationRequest(req);
+
         if (userRepository.findByUsername(req.getUsername()).isPresent()) {
             throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_ALREADY_EXISTS, ErrorCodesEnum.USERNAME_ALREADY_EXISTS.getMessage());
         }
@@ -49,6 +46,15 @@ public class RegistrationService {
         authorityRepository.addAuthorityToUser(saved.getUsername(), AuthorityEnum.USER);
 
         return userMapper.toDto(saved);
+    }
+
+    private void validateRegistrationRequest(RegistrationRequestDto req) {
+        if (req.getUsername() == null || req.getUsername().trim().isEmpty()) {
+            throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_EMPTY);
+        }
+        if (req.getPassword() == null || req.getPassword().isEmpty()) {
+            throw new RegistrationServiceException(ErrorCodesEnum.PASSWORD_EMPTY);
+        }
     }
 
 }

@@ -1,24 +1,25 @@
 package com.tutorial.Enum;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCodesEnum {
-    SUCCESS(200, "Registration successful"),
-    USERNAME_ALREADY_EXISTS(409, "Username already exists"),
-    USER_NOT_FOUND(404, "User not found"),
-    USERNAME_EMPTY(400, "Username cannot be empty"),
-    PASSWORD_EMPTY(400, "Password cannot be empty"),
-    UNACCEPTABLE_USERNAME(400, "Username does not meet requirements"),
-    UNACCEPTABLE_PASSWORD(400, "Password does not meet requirements"),
-    UNACCEPTABLE_AUTHORITY(400, "Authority does not meet requirements"),
-    DB_ERROR(500, "Database error occurred");
+    SUCCESS(HttpStatus.OK, "Successful"),
+    USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "Username already exists"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
+    USERNAME_EMPTY(HttpStatus.BAD_REQUEST, "Username cannot be empty"),
+    PASSWORD_EMPTY(HttpStatus.BAD_REQUEST, "Password cannot be empty"),
+    UNACCEPTABLE_USERNAME(HttpStatus.BAD_REQUEST, "Username does not meet requirements"),
+    UNACCEPTABLE_PASSWORD(HttpStatus.BAD_REQUEST, "Password does not meet requirements"),
+    UNACCEPTABLE_AUTHORITY(HttpStatus.BAD_REQUEST, "Authority does not meet requirements"),
+    DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurred");
 
-    private final int httpStatusCode;
+    private final HttpStatus httpStatus;
     private final String message;
 
-    ErrorCodesEnum(int httpStatusCode, String message) {
-        this.httpStatusCode = httpStatusCode;
+    ErrorCodesEnum(HttpStatus httpStatus, String message) {
+        this.httpStatus = httpStatus;
         this.message = message;
     }
 }
