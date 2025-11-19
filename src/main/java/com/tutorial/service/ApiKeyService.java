@@ -78,12 +78,12 @@ public class ApiKeyService {
     }
 
     private String generateApiKey() {
-        StringBuilder sb = new StringBuilder(API_KEY_LENGTH);
+        StringBuilder stringBuilder = new StringBuilder(API_KEY_LENGTH);
 
         for (int i = 0; i < API_KEY_LENGTH; i++) {
-            sb.append(CHARACTERS.charAt(SECURE_RANDOM.nextInt(CHARACTERS.length())));
+            stringBuilder.append(CHARACTERS.charAt(SECURE_RANDOM.nextInt(CHARACTERS.length())));
         }
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
 }
