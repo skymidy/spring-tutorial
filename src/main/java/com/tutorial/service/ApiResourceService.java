@@ -26,6 +26,7 @@ public class ApiResourceService {
     this.authorityRepository = authorityRepository;
   }
 
+  //TODO: rework
   private String currentUsername() {
     Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     return p == null ? null : p.toString();
@@ -34,14 +35,15 @@ public class ApiResourceService {
   public ApiResource create(ApiResourceDto dto) {
     String username = currentUsername();
     User owner = userRepository.findByUsername(username).orElseThrow(() -> new IllegalStateException("user not found"));
-    ApiResource r = new ApiResource();
-    r.setAuthenticationType(null);
-    r.setName(dto.getName());
-    r.setBaseUrl(dto.getBaseUrl());
-    r.setIsEnabled(dto.getIsEnabled() == null || dto.getIsEnabled());
-    r.setApiKey(dto.getApiKey());
-    r.setOwner(owner);
-    return apiResourceRepository.save(r);
+
+    ApiResource newApiResource = new ApiResource();
+    newApiResource.setAuthenticationType(null);
+    newApiResource.setName(dto.getName());
+    newApiResource.setBaseUrl(dto.getBaseUrl());
+    newApiResource.setIsEnabled(dto.getIsEnabled() == null || dto.getIsEnabled());
+    newApiResource.setApiKey(dto.getApiKey());
+    newApiResource.setOwner(owner);
+    return apiResourceRepository.save(newApiResource);
   }
 
   public Optional<ApiResource> findById(Integer id) {
