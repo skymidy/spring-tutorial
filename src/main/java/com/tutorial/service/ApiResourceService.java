@@ -6,7 +6,7 @@ import com.tutorial.model.entity.User;
 import com.tutorial.repository.ApiResourceRepository;
 import com.tutorial.repository.UserRepository;
 import com.tutorial.repository.AuthorityRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,15 +26,8 @@ public class ApiResourceService {
     this.authorityRepository = authorityRepository;
   }
 
-  //TODO: rework
-  private String currentUsername() {
-    Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    return p == null ? null : p.toString();
-  }
-
-  public ApiResource create(ApiResourceDto dto) {
-    String username = currentUsername();
-    User owner = userRepository.findByUsername(username).orElseThrow(() -> new IllegalStateException("user not found"));
+  public ApiResource create(ApiResourceDto dto, UserDetails currentUser) {
+    User owner = userRepository.findByUsername(currentUser.getUsername()).orElseThrow(() -> new IllegalStateException("user not found"));
 
     ApiResource newApiResource = new ApiResource();
     newApiResource.setAuthenticationType(null);
@@ -50,18 +43,16 @@ public class ApiResourceService {
     return apiResourceRepository.findById(id);
   }
 
-  public List<ApiResource> listForCurrentUser() {
-    String username = currentUsername();
-    if (isAdmin(username)) {
+  public List<ApiResource> listForCurrentUser(UserDetails currentUser) {
+    if (isAdmin(currentUser.getUsername())) {
       return apiResourceRepository.findAll();
     }
-    return apiResourceRepository.findByOwner_Username(username);
+    return apiResourceRepository.findByOwner_Username(currentUser.getUsername());
   }
 
-  public ApiResource update(Integer id, ApiResourceDto dto) {
+  public ApiResource update(Integer id, ApiResourceDto dto,UserDetails currentUser) {
     ApiResource existing = apiResourceRepository.findById(id).orElseThrow(() -> new IllegalStateException("not found"));
-    String username = currentUsername();
-    if (!isAdmin(username) && !existing.getOwner().getUsername().equals(username)) {
+    if (!isAdmin(currentUser.getUsername()) && !existing.getOwner().getUsername().equals(currentUser.getUsername())) {
       throw new SecurityException("forbidden");
     }
     if (dto.getName() != null)
@@ -75,10 +66,9 @@ public class ApiResourceService {
     return apiResourceRepository.save(existing);
   }
 
-  public void delete(Integer id) {
+  public void delete(Integer id,UserDetails currentUser) {
     ApiResource existing = apiResourceRepository.findById(id).orElseThrow(() -> new IllegalStateException("not found"));
-    String username = currentUsername();
-    if (!isAllowed(existing, username)) {
+    if (!isAllowed(existing, currentUser.getUsername())) {
       throw new SecurityException("forbidden");
     }
     apiResourceRepository.deleteById(id);
