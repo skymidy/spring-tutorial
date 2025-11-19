@@ -39,9 +39,9 @@ public class RegistrationService {
             throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_ALREADY_EXISTS, ErrorCodesEnum.USERNAME_ALREADY_EXISTS.getMessage());
         }
 
-        User u = new User(req.getUsername(), passwordEncoder.encode(req.getPassword()));
+        User user = new User(req.getUsername(), passwordEncoder.encode(req.getPassword()));
 
-        User saved = userRepository.save(u);
+        User saved = userRepository.save(user);
 
         authorityRepository.addAuthorityToUser(saved.getUsername(), AuthorityEnum.USER);
 
