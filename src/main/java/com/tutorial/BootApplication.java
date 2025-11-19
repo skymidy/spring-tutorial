@@ -12,9 +12,4 @@ public class BootApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BootApplication.class, args);
 	}
-
-    @GetMapping("/")
-    public String helloWorld(){
-        return "Hello Spring Boot";
-    }
 }
