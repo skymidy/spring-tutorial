@@ -30,12 +30,12 @@ public class ApiResourceController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResource> get(@PathVariable Integer id) {
+  public ResponseEntity<ApiResource> get(@PathVariable("id") Integer id) {
     return service.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody ApiResourceDto dto) {
+  public ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody ApiResourceDto dto) {
     try {
       ApiResource updated = service.update(id, dto);
       return ResponseEntity.ok(updated);
@@ -45,7 +45,7 @@ public class ApiResourceController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> delete(@PathVariable Integer id) {
+  public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
     try {
       service.delete(id);
       return ResponseEntity.noContent().build();
