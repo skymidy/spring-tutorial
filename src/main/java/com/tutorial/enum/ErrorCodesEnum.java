@@ -14,7 +14,8 @@ public enum ErrorCodesEnum {
     UNACCEPTABLE_PASSWORD(HttpStatus.BAD_REQUEST, "Password does not meet requirements"),
     UNACCEPTABLE_AUTHORITY(HttpStatus.BAD_REQUEST, "Authority does not meet requirements"),
     DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurred"),
-    UNLUCKY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "RandomGenerator Error");
+    UNLUCKY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "RandomGenerator Error"),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "Access denied");
 
     private final HttpStatus httpStatus;
     private final String message;
