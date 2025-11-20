@@ -1,9 +1,6 @@
 package com.tutorial.controller.advice;
 
-import com.tutorial.exceptions.ApiKeyServiceException;
-import com.tutorial.exceptions.AuthorityServiceException;
-import com.tutorial.exceptions.BaseServiceException;
-import com.tutorial.exceptions.RegistrationServiceException;
+import com.tutorial.exceptions.*;
 import com.tutorial.model.dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +25,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(ApiKeyServiceException e) {
         return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
     }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(PasswordServiceException e) {
+        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+    }
+
 
     private ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e,String messageTemplate) {
         HttpStatus status = e.getCode().getHttpStatus();
