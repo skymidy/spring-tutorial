@@ -3,6 +3,7 @@ package com.tutorial.controller;
 import com.tutorial.model.dto.AuthorityDto;
 import com.tutorial.model.dto.UsernameDto;
 import com.tutorial.service.AuthorityService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,23 +22,29 @@ public class AuthorityController {
     }
 
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> getAllAvailableAuthorities() {
         return authorityService.getAllAvailableAuthorities();
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/me")
     public Set<String> getAllAuthoritiesOfCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         return authorityService.getAllUserAuthorities(userDetails.getUsername());
     }
 
+
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> getAllAuthoritiesOfUser(@PathVariable("username") String username) {
         return authorityService.getAllUserAuthorities(username);
     }
 
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> assignAuthoritiesToUser(@PathVariable("username") String username,
@@ -45,6 +52,8 @@ public class AuthorityController {
         return authorityService.assignAuthorityToUser(username, authorityDto);
     }
 
+
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> removeAuthoritiesFromUser(@PathVariable("username") String username,
