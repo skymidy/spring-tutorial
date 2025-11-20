@@ -9,17 +9,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface AuthorityRepository extends Repository<Authority, AuthorityId> {
 
-    Authority save(Authority role);
+    Authority save(Authority authority);
+
+    Set<Authority> saveAll(Set<Authority> authority);
 
     Optional<Authority> findByUsername(String username);
 
     @Query("SELECT authority FROM Authority WHERE username = :username")
-    List<String> findAllByUsername(@Param("username") String username);
+    Set<String> findAllByUsername(@Param("username") String username);
 
     Optional<Authority> findByAuthority(String authority);
 
@@ -30,6 +32,10 @@ public interface AuthorityRepository extends Repository<Authority, AuthorityId> 
     @Modifying
     @Query("DELETE FROM Authority WHERE username = :username AND authority = :authority")
     int removeAuthorityFromUser(@Param("username") String username, @Param("authority") AuthorityEnum authority);
+
+    @Modifying
+    @Query(value = "DELETE FROM Authority WHERE username = :username AND authority IN :authorities", nativeQuery = true)
+    int removeAuthoritiesFromUser(@Param("username") String username, @Param("authorities") Set<AuthorityEnum> authorities);
 
     @Modifying
     @Query("DELETE FROM Authority WHERE username = :username")
