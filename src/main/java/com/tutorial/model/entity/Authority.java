@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,5 +26,19 @@ public class Authority {
   @Enumerated(EnumType.STRING)
   @Column(name = "authority", nullable = false, length = 50)
   private AuthorityEnum authority = AuthorityEnum.USER;
+
+  @Override
+  public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Authority)) return false;
+      Authority that = (Authority) o;
+      return Objects.equals(username, that.username) &&
+              authority == that.authority;
+  }
+
+  @Override
+  public int hashCode() {
+      return Objects.hash(username, authority);
+  }
 
 }
