@@ -21,13 +21,15 @@ public class RegistrationService {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApiKeyService apiKeyService;
 
     public RegistrationService(UserRepository userRepository, AuthorityRepository authorityRepository,
-                               PasswordEncoder passwordEncoder, UserMapper userMapper) {
+                               PasswordEncoder passwordEncoder, UserMapper userMapper, ApiKeyService apiKeyService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.apiKeyService = apiKeyService;
     }
 
     @Transactional
@@ -39,11 +41,13 @@ public class RegistrationService {
             throw new RegistrationServiceException(ErrorCodesEnum.USERNAME_ALREADY_EXISTS, ErrorCodesEnum.USERNAME_ALREADY_EXISTS.getMessage());
         }
 
-        User user = new User(req.getUsername(), passwordEncoder.encode(req.getPassword()));
-
-        User saved = userRepository.save(user);
+        User saved = userRepository.save(
+                new User(req.getUsername(), passwordEncoder.encode(req.getPassword()))
+        );
 
         authorityRepository.addAuthorityToUser(saved.getUsername(), AuthorityEnum.USER);
+
+        apiKeyService.generateApiKeyForUser(saved.getUsername());
 
         return userMapper.toDto(saved);
     }
