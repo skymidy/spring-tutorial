@@ -1,14 +1,34 @@
 package com.tutorial.mapper;
 
-import org.mapstruct.Mapper;
-
+import com.tutorial.Enum.AuthorityEnum;
 import com.tutorial.model.dto.AuthorityDto;
 import com.tutorial.model.entity.Authority;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface AuthorityMapper {
 
-  AuthorityDto toDto(Authority role);
+    default AuthorityEnum toEnum(String authority) {
+        return AuthorityEnum.valueOf(authority);
+    }
 
-  Authority toEntity(AuthorityDto dto);
+
+    @Mapping(target = "username", source = "username")
+    @Mapping(target = "authority", expression = "java(AuthorityEnum.valueOf(authority))")
+    Authority toEntity(String authority, String username);
+
+
+    default Set<Authority> toEntitySet(String username, AuthorityDto dto) {
+        if (dto == null || dto.getAuthorities() == null) {
+            return Set.of();
+        }
+
+        return dto.getAuthorities().stream()
+                .map(auth -> toEntity(auth, username))
+                .collect(Collectors.toSet());
+    }
 }
