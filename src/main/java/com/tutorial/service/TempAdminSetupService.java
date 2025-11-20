@@ -2,6 +2,8 @@ package com.tutorial.service;
 
 import com.tutorial.Enum.AuthorityEnum;
 import com.tutorial.configs.AdminProperties;
+import com.tutorial.mapper.AuthorityMapper;
+import com.tutorial.model.dto.AuthorityDto;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.AuthorityRepository;
 import com.tutorial.repository.UserRepository;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -22,15 +25,17 @@ public class TempAdminSetupService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminProperties adminProperties;
+    private final AuthorityMapper authorityMapper;
 
     public TempAdminSetupService(UserRepository userRepository,
                                  AuthorityRepository authorityRepository,
                                  PasswordEncoder passwordEncoder,
-                                 AdminProperties adminProperties) {
+                                 AdminProperties adminProperties, AuthorityMapper authorityMapper) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminProperties = adminProperties;
+        this.authorityMapper = authorityMapper;
     }
 
 
@@ -58,9 +63,10 @@ public class TempAdminSetupService {
 
         userRepository.save(tempAdmin);
 
-        for (AuthorityEnum authority : adminProperties.getAuthorities()) {
-            authorityRepository.addAuthorityToUser(adminProperties.getUsername(),authority);
-        }
+        authorityRepository.saveAll(
+                authorityMapper.toEntitySet(
+                        tempAdmin.getUsername(),
+                        new AuthorityDto(adminProperties.getAuthorities().stream().map(Enum::toString).collect(Collectors.toSet()))));
 
         log.info("Temporary admin created: {} with authority: {})",
                 adminProperties.getUsername(), adminProperties.getAuthorities().toString());
