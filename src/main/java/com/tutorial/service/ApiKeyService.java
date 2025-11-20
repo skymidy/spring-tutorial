@@ -1,7 +1,6 @@
 package com.tutorial.service;
 
 import java.security.SecureRandom;
-import java.util.Optional;
 
 import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.exceptions.ApiKeyServiceException;
@@ -42,24 +41,10 @@ public class ApiKeyService {
         return newApiKey;
     }
 
-    public String regenerateApiKey(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-
-        String newApiKey = generateUniqueApiKey();
-
-        user.setApiKey(newApiKey);
-        userRepository.save(user);
-
-        return newApiKey;
-    }
-
-    public boolean validateApiKey(String apiKey) {
-        return userRepository.findByApiKey(apiKey).isPresent();
-    }
-
-    public Optional<UserDto> getUserByApiKey(String apiKey) {
-        return userRepository.findByApiKey(apiKey).map(userMapper::toDto);
+    public UserDto getUserByApiKey(String apiKey) {
+        return userRepository.findByApiKey(apiKey)
+                .map(userMapper::toDto)
+                .orElseThrow(()-> new ApiKeyServiceException(ErrorCodesEnum.USER_NOT_FOUND));
     }
 
     private String generateUniqueApiKey() {
