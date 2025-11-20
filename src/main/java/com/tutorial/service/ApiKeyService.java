@@ -86,4 +86,13 @@ public class ApiKeyService {
 
         return stringBuilder.toString();
     }
+
+    private User getUser(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApiKeyServiceException(ErrorCodesEnum.USER_NOT_FOUND));
+    }
+
+    private boolean validateApiKey(String apiKey) {
+        return userRepository.existsByApiKey(apiKey);
+    }
 }
