@@ -33,8 +33,7 @@ public class ApiKeyService {
     }
 
     public String generateApiKeyForUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        User user = getUser(username);
 
         String newApiKey = generateUniqueApiKey();
         user.setApiKey(newApiKey);
@@ -69,7 +68,7 @@ public class ApiKeyService {
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
             String apiKey = generateApiKey();
 
-            if (!userRepository.existsByApiKey(apiKey)) {
+            if (!validateApiKey(apiKey)) {
                 return apiKey;
             }
         }
