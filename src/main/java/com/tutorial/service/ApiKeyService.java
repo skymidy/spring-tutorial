@@ -47,6 +47,12 @@ public class ApiKeyService {
                 .orElseThrow(()-> new ApiKeyServiceException(ErrorCodesEnum.USER_NOT_FOUND));
     }
 
+    public String getUserApiKey(String username){
+        return getUser(username).getApiKey();
+    }
+
+
+
     private String generateUniqueApiKey() {
         int maxAttempts = 100; // Reasonable limit to prevent infinite loop
 
