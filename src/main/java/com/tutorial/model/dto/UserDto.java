@@ -7,4 +7,5 @@ public class UserDto {
   private String username;
   private String apiKey;
   private Long rateLimit;
+  private boolean enabled;
 }
