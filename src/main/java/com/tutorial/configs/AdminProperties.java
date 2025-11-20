@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Set;
 
 @Component
 @Configuration
@@ -15,5 +15,5 @@ import java.util.List;
 public class AdminProperties {
     private String username;
     private String password;
-    private List<AuthorityEnum> authorities = List.of(AuthorityEnum.ADMIN);
+    private Set<AuthorityEnum> authorities = Set.of(AuthorityEnum.ADMIN);
 }
