@@ -15,7 +15,8 @@ public enum ErrorCodesEnum {
     UNACCEPTABLE_AUTHORITY(HttpStatus.BAD_REQUEST, "Authority does not meet requirements"),
     DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurred"),
     UNLUCKY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "RandomGenerator Error"),
-    ACCESS_DENIED(HttpStatus.FORBIDDEN, "Access denied");
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "Access denied"),
+    API_RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "ApiResource not found");
 
     private final HttpStatus httpStatus;
     private final String message;
