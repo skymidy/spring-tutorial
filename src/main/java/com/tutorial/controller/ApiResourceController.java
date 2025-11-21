@@ -3,56 +3,66 @@ package com.tutorial.controller;
 import com.tutorial.model.dto.ApiResourceDto;
 import com.tutorial.model.entity.ApiResource;
 import com.tutorial.service.ApiResourceService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/resources")
+@RequestMapping("/api/resource")
 public class ApiResourceController {
 
-  private final ApiResourceService apiResourceService;
+    private final ApiResourceService apiResourceService;
 
-  public ApiResourceController(ApiResourceService service) {
-    this.apiResourceService = service;
-  }
-
-  @PostMapping
-  public ResponseEntity<ApiResource> create(@RequestBody ApiResourceDto dto, @AuthenticationPrincipal UserDetails userDetails) {
-    ApiResource r = apiResourceService.create(dto, userDetails);
-    return ResponseEntity.status(201).body(r);
-  }
-
-  @GetMapping
-  public ResponseEntity<List<ApiResource>> list(@AuthenticationPrincipal UserDetails userDetails) {
-    return ResponseEntity.ok(apiResourceService.listForCurrentUser(userDetails));
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<ApiResource> get(@PathVariable("id") Integer id) {
-    return apiResourceService.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-  }
-
-  @PutMapping("/{id}")
-  public ResponseEntity<?> update(@PathVariable("id") Integer id, @RequestBody ApiResourceDto dto, @AuthenticationPrincipal UserDetails userDetails) {
-    try {
-      ApiResource updated = apiResourceService.update(id, dto, userDetails);
-      return ResponseEntity.ok(updated);
-    } catch (SecurityException se) {
-      return ResponseEntity.status(403).body(se.getMessage());
+    public ApiResourceController(ApiResourceService service) {
+        this.apiResourceService = service;
     }
-  }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<?> delete(@PathVariable("id") Integer id, @AuthenticationPrincipal UserDetails userDetails) {
-    try {
-      apiResourceService.delete(id, userDetails);
-      return ResponseEntity.noContent().build();
-    } catch (SecurityException se) {
-      return ResponseEntity.status(403).body(se.getMessage());
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    public ApiResourceDto create(@RequestBody ApiResourceDto dto) {
+        return apiResourceService.create(dto);
     }
-  }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Set<ApiResourceDto> getAll() {
+        return apiResourceService.getAllResources();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
+    public Set<ApiResourceDto> getAllEnabled() {
+        return apiResourceService.getAllEnabledResources();
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{apiAlias}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ApiResourceDto get(@PathVariable("apiAlias") String apiAlias) {
+        return apiResourceService.findByAlias(apiAlias);
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{apiAlias}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ApiResourceDto update(@PathVariable("apiAlias") String apiAlias, @RequestBody ApiResourceDto dto) {
+        return apiResourceService.update(apiAlias, dto);
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{apiAlias}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public long delete(@PathVariable("apiAlias") String apiAlias) {
+        return apiResourceService.delete(apiAlias);
+    }
 }
