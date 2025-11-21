@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDto> catchRegistrationServiceException(AuthorityServiceException e) {
         return genericResponse(e,"AuthorityService Exception! Code: {}, Message: {}");
     }
+
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(ApiKeyServiceException e) {
         return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
@@ -28,6 +29,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(PasswordServiceException e) {
+        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponseDto> catchApiResourceServiceException(ApiResourceServiceException e) {
         return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
     }
 
