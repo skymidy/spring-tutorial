@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user/apikey")
+@RequestMapping("/api/apikey")
 public class ApiKeyController {
     private final ApiKeyService apiKeyService;
 
@@ -20,34 +20,34 @@ public class ApiKeyController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping
+    @GetMapping("/me")
     public String getApiKey(@AuthenticationPrincipal UserDetails userDetails) {
         return apiKeyService.getUserApiKey(userDetails.getUsername());
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping
-    public String getUserApiKey(@RequestBody UsernameDto usernameDto) {
-        return apiKeyService.getUserApiKey(usernameDto.getUsername());
+    @GetMapping("/user/{username}")
+    public String getUserApiKey(@PathVariable("username") String username) {
+        return apiKeyService.getUserApiKey(username);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping
-    public String getUserByApiKey(@RequestBody UsernameDto usernameDto) {
-        return apiKeyService.getUserApiKey(usernameDto.getUsername());
+    @GetMapping("/key")
+    public String getUserByApiKey(@RequestBody ApiKeyDto apiKeyDto) {
+        return apiKeyService.getUserApiKey(apiKeyDto.getApiKey());
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping
+    @GetMapping("/me/new")
     public String generateNewApiKey(@AuthenticationPrincipal UserDetails userDetails){
         return apiKeyService.generateApiKeyForUser(userDetails.getUsername());
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping
+    @GetMapping("/user/{username}/new")
     public UserDto generateNewApiKeyForUser(@RequestBody ApiKeyDto apiKeyDto){
         return apiKeyService.getUserByApiKey(apiKeyDto.getApiKey());
     }
