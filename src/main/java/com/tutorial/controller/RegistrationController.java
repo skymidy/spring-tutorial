@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/register")
 public class RegistrationController {
 
     private final RegistrationService registrationService;
@@ -18,7 +18,7 @@ public class RegistrationController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/register")
+    @PostMapping
     public UserDto register(@RequestBody RegistrationRequestDto req) {
         return registrationService.register(req);
     }

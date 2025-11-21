@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 
-@RestController("/api")
+@RestController("/api/proxy")
 public class ProxyController {
 
     private final ProxyService proxyService;
@@ -17,7 +17,7 @@ public class ProxyController {
         this.proxyService = proxyService;
     }
 
-    @RequestMapping(value = "/proxy/{apiAlias}/**")
+    @RequestMapping(value = "/{apiAlias}/**")
     public Mono<ResponseEntity<byte[]>> proxy(
             @PathVariable("apiAlias") String apiAlias,
             @RequestBody(required = false) byte[] body,
