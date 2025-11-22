@@ -19,6 +19,6 @@ public interface ApiResourceRepository extends JpaRepository<ApiResource, Intege
     Optional<ApiResource> findByNameAndIsEnabledTrue(String name);
     Optional<ApiResource> findByName(String name);
 
-    long deleteById(Integer id);      // count deleted rows
+    void deleteById(Integer id);      // count deleted rows
     long deleteByName(String name);   // count deleted rows
 }
