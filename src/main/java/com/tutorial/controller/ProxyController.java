@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 
-@RestController("/api/proxy")
+@RestController
+@RequestMapping("/api/proxy")
 public class ProxyController {
 
     private final ProxyService proxyService;
