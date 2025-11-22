@@ -26,7 +26,7 @@ public class ApiKeyController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/me/new")
+    @PostMapping("/me")
     public ApiKeyDto generateNewApiKey(@AuthenticationPrincipal UserDetails userDetails){
         return apiKeyService.generateApiKeyForUser(userDetails.getUsername());
     }
@@ -47,7 +47,7 @@ public class ApiKeyController {
 
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/user/{username}/new")
+    @PostMapping("/user/{username}")
     public ApiKeyDto generateNewApiKeyForUser(@RequestBody UsernameDto usernameDto){
         return apiKeyService.generateApiKeyForUser(usernameDto.getUsername());
     }
