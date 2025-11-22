@@ -22,14 +22,16 @@ public class RegistrationService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final ApiKeyService apiKeyService;
+    private final RateLimitService rateLimitService;
 
     public RegistrationService(UserRepository userRepository, AuthorityRepository authorityRepository,
-                               PasswordEncoder passwordEncoder, UserMapper userMapper, ApiKeyService apiKeyService) {
+                               PasswordEncoder passwordEncoder, UserMapper userMapper, ApiKeyService apiKeyService, RateLimitService rateLimitService) {
         this.userRepository = userRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
         this.apiKeyService = apiKeyService;
+        this.rateLimitService = rateLimitService;
     }
 
     @Transactional
@@ -48,6 +50,8 @@ public class RegistrationService {
         authorityRepository.addAuthorityToUser(saved.getUsername(), AuthorityEnum.USER);
 
         apiKeyService.generateApiKeyForUser(saved.getUsername());
+
+        rateLimitService.updateUserRateLimit(saved.getUsername(), 60L);
 
         return userMapper.toDto(saved);
     }
