@@ -37,11 +37,16 @@ public class GlobalExceptionHandler {
         return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponseDto> catchRateLimitServiceException(RateLimitServiceException e) {
+        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+    }
+
 
     private ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e,String messageTemplate) {
         HttpStatus status = e.getCode().getHttpStatus();
         String message = e.getMessage();
-        log.error("RegistrationServiceException status: {}, message: {}", status, message, e);
+        log.error(messageTemplate, status, message, e);
         return ResponseEntity
                 .status(status)
                 .body(new ErrorResponseDto(status.value(), message));
