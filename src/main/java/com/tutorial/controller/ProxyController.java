@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 
 
 @RestController
-@RequestMapping("/api/proxy")
+@RequestMapping("/proxy")
 public class ProxyController {
 
     private final ProxyService proxyService;
@@ -23,8 +23,6 @@ public class ProxyController {
             @PathVariable("apiAlias") String apiAlias,
             @RequestBody(required = false) byte[] body,
             ServerHttpRequest serverRequest) {
-
-
 
         return proxyService.proxyRequest(
                         apiAlias,
