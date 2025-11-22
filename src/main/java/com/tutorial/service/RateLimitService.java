@@ -3,6 +3,7 @@ package com.tutorial.service;
 import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.exceptions.RateLimitServiceException;
 import com.tutorial.mapper.UserMapper;
+import com.tutorial.model.dto.RateLimitDto;
 import com.tutorial.model.dto.UserDto;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.UserRepository;
@@ -22,9 +23,7 @@ public class RateLimitService {
 
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(
-                        () -> new RateLimitServiceException(ErrorCodesEnum.USER_NOT_FOUND)
-                );
+                .orElseThrow(() -> new RateLimitServiceException(ErrorCodesEnum.USER_NOT_FOUND));
 
         if(rateLimit <= 0) {
             throw new RateLimitServiceException(ErrorCodesEnum.UNACCEPTABLE_RATE_LIMIT_VALUE, "RateLimit value zer or below unacceptable");
@@ -33,5 +32,14 @@ public class RateLimitService {
         user.setRateLimit(rateLimit);
 
         return userMapper.toDto(userRepository.save(user));
+    }
+
+    public RateLimitDto getUserRateLimit(String username) {
+        return new RateLimitDto(
+                userRepository
+                        .findByUsername(username)
+                        .orElseThrow(() -> new RateLimitServiceException(ErrorCodesEnum.USER_NOT_FOUND))
+                        .getRateLimit()
+        );
     }
 }
