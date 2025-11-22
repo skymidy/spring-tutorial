@@ -1,6 +1,5 @@
 package com.tutorial.service;
 
-import com.tutorial.Enum.AuthorityEnum;
 import com.tutorial.configs.AdminProperties;
 import com.tutorial.mapper.AuthorityMapper;
 import com.tutorial.model.dto.AuthorityDto;
