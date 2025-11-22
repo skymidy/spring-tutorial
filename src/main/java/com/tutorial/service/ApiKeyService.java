@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.exceptions.ApiKeyServiceException;
 import com.tutorial.mapper.UserMapper;
+import com.tutorial.model.dto.ApiKeyDto;
 import com.tutorial.model.dto.UserDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +32,14 @@ public class ApiKeyService {
 
     }
 
-    public String generateApiKeyForUser(String username) {
+    public ApiKeyDto generateApiKeyForUser(String username) {
         User user = getUser(username);
 
         String newApiKey = generateUniqueApiKey();
         user.setApiKey(newApiKey);
         userRepository.save(user);
 
-        return newApiKey;
+        return new ApiKeyDto(newApiKey);
     }
 
     public UserDto getUserByApiKey(String apiKey) {
@@ -47,8 +48,8 @@ public class ApiKeyService {
                 .orElseThrow(()-> new ApiKeyServiceException(ErrorCodesEnum.USER_NOT_FOUND));
     }
 
-    public String getUserApiKey(String username){
-        return getUser(username).getApiKey();
+    public ApiKeyDto getUserApiKey(String username){
+        return new ApiKeyDto(getUser(username).getApiKey());
     }
 
 

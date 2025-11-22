@@ -21,35 +21,35 @@ public class ApiKeyController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/me")
-    public String getApiKey(@AuthenticationPrincipal UserDetails userDetails) {
+    public ApiKeyDto getApiKey(@AuthenticationPrincipal UserDetails userDetails) {
         return apiKeyService.getUserApiKey(userDetails.getUsername());
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/me/new")
+    public ApiKeyDto generateNewApiKey(@AuthenticationPrincipal UserDetails userDetails){
+        return apiKeyService.generateApiKeyForUser(userDetails.getUsername());
+    }
+    
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/key")
+    public UserDto getUserByApiKey(@RequestBody ApiKeyDto apiKeyDto) {
+        return apiKeyService.getUserByApiKey(apiKeyDto.getApiKey());
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/user/{username}")
-    public String getUserApiKey(@PathVariable("username") String username) {
+    public ApiKeyDto getUserApiKey(@PathVariable("username") String username) {
         return apiKeyService.getUserApiKey(username);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/key")
-    public String getUserByApiKey(@RequestBody ApiKeyDto apiKeyDto) {
-        return apiKeyService.getUserApiKey(apiKeyDto.getApiKey());
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/me/new")
-    public String generateNewApiKey(@AuthenticationPrincipal UserDetails userDetails){
-        return apiKeyService.generateApiKeyForUser(userDetails.getUsername());
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/user/{username}/new")
-    public UserDto generateNewApiKeyForUser(@RequestBody ApiKeyDto apiKeyDto){
-        return apiKeyService.getUserByApiKey(apiKeyDto.getApiKey());
+    public ApiKeyDto generateNewApiKeyForUser(@RequestBody UsernameDto usernameDto){
+        return apiKeyService.generateApiKeyForUser(usernameDto.getUsername());
     }
 
 }
