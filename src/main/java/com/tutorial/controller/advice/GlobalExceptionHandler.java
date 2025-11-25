@@ -47,6 +47,16 @@ public class GlobalExceptionHandler {
         return genericResponse(e, "ProxyService Exception! Code: {}, Message: {}");
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDto> catchException(Exception ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String message = ex.getMessage();
+        log.error("Uncaught Exception! Code: {}, Message: {}", status, message, ex);
+        return ResponseEntity
+                .status(status)
+                .body(new ErrorResponseDto(status.value(), message));
+    }
+
 
     private ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e, String messageTemplate) {
         HttpStatus status = e.getCode().getHttpStatus();
