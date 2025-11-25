@@ -14,36 +14,41 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchRegistrationServiceException(RegistrationServiceException e) {
-        return genericResponse(e,"RegistrationService Exception! Code: {}, Message: {}");
+        return genericResponse(e, "RegistrationService Exception! Code: {}, Message: {}");
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchRegistrationServiceException(AuthorityServiceException e) {
-        return genericResponse(e,"AuthorityService Exception! Code: {}, Message: {}");
+        return genericResponse(e, "AuthorityService Exception! Code: {}, Message: {}");
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(ApiKeyServiceException e) {
-        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+        return genericResponse(e, "ApiKeyService Exception! Code: {}, Message: {}");
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchApiKeyServiceException(PasswordServiceException e) {
-        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+        return genericResponse(e, "PasswordService Exception! Code: {}, Message: {}");
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchApiResourceServiceException(ApiResourceServiceException e) {
-        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+        return genericResponse(e, "ApiResourceService Exception! Code: {}, Message: {}");
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponseDto> catchRateLimitServiceException(RateLimitServiceException e) {
-        return genericResponse(e,"ApiKeyService Exception! Code: {}, Message: {}");
+        return genericResponse(e, "RateLimitService Exception! Code: {}, Message: {}");
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponseDto> catchProxyServiceException(ProxyServiceException e) {
+        return genericResponse(e, "ProxyService Exception! Code: {}, Message: {}");
     }
 
 
-    private ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e,String messageTemplate) {
+    private ResponseEntity<ErrorResponseDto> genericResponse(BaseServiceException e, String messageTemplate) {
         HttpStatus status = e.getCode().getHttpStatus();
         String message = e.getMessage();
         log.error(messageTemplate, status, message, e);
