@@ -16,10 +16,10 @@ public interface AuthorityMapper {
         return AuthorityEnum.valueOf(authority);
     }
 
-
     @Mapping(target = "username", source = "username")
-    @Mapping(target = "authority", expression = "java(AuthorityEnum.valueOf(authority))")
+    @Mapping(target = "authority", source = "authority")
     Authority toEntity(String authority, String username);
+
 
 
     default Set<Authority> toEntitySet(String username, AuthorityDto dto) {
