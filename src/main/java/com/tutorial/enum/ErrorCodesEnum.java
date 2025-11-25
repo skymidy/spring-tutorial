@@ -17,7 +17,8 @@ public enum ErrorCodesEnum {
     UNLUCKY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "RandomGenerator Error"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "Access denied"),
     API_RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "ApiResource not found"),
-    UNACCEPTABLE_RATE_LIMIT_VALUE(HttpStatus.BAD_REQUEST, "Rate limit value  does not meet requirements");
+    UNACCEPTABLE_RATE_LIMIT_VALUE(HttpStatus.BAD_REQUEST, "Rate limit value  does not meet requirements"),
+    INVALID_PATH(HttpStatus.BAD_REQUEST, "Path  does not meet requirements");
 
     private final HttpStatus httpStatus;
     private final String message;
