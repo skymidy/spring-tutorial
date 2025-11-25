@@ -48,7 +48,7 @@ public class AuthorityController {
     @PostMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> assignAuthoritiesToUser(@PathVariable("username") String username,
-                                             @RequestBody AuthorityDto authorityDto) {
+                                               @RequestBody AuthorityDto authorityDto) {
         return authorityService.assignAuthorityToUser(username, authorityDto);
     }
 
@@ -57,7 +57,7 @@ public class AuthorityController {
     @DeleteMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> removeAuthoritiesFromUser(@PathVariable("username") String username,
-                                               @RequestBody AuthorityDto authorityDto) {
+                                                 @RequestBody AuthorityDto authorityDto) {
         return authorityService.removeAuthorityFromUser(username, authorityDto);
     }
 

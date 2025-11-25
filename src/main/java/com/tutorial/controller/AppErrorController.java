@@ -14,17 +14,17 @@ import java.util.Map;
 @Controller
 public class AppErrorController implements ErrorController {
 
-  private final ErrorAttributes errorAttributes;
+    private final ErrorAttributes errorAttributes;
 
-  public AppErrorController(ErrorAttributes errorAttributes) {
-    this.errorAttributes = errorAttributes;
-  }
+    public AppErrorController(ErrorAttributes errorAttributes) {
+        this.errorAttributes = errorAttributes;
+    }
 
-  @RequestMapping("/error")
-  public ResponseEntity<Map<String, Object>> handleError(HttpServletRequest request) {
-    ServletWebRequest webRequest = new ServletWebRequest(request);
-    Map<String, Object> attrs = this.errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.defaults());
-    int status = (int) attrs.getOrDefault("status", 500);
-    return ResponseEntity.status(status).body(attrs);
-  }
+    @RequestMapping("/error")
+    public ResponseEntity<Map<String, Object>> handleError(HttpServletRequest request) {
+        ServletWebRequest webRequest = new ServletWebRequest(request);
+        Map<String, Object> attrs = this.errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.defaults());
+        int status = (int) attrs.getOrDefault("status", 500);
+        return ResponseEntity.status(status).body(attrs);
+    }
 }

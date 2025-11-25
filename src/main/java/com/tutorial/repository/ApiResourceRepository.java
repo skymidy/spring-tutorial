@@ -17,8 +17,10 @@ public interface ApiResourceRepository extends JpaRepository<ApiResource, Intege
     Set<ApiResource> findByOwner_Username(String username);
 
     Optional<ApiResource> findByNameAndIsEnabledTrue(String name);
+
     Optional<ApiResource> findByName(String name);
 
     void deleteById(Integer id);      // count deleted rows
+
     long deleteByName(String name);   // count deleted rows
 }

@@ -26,7 +26,7 @@ public class ApiKeyService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public ApiKeyService(UserRepository userRepository, UserMapper userMapper){
+    public ApiKeyService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
 
@@ -45,13 +45,12 @@ public class ApiKeyService {
     public UserDto getUserByApiKey(String apiKey) {
         return userRepository.findByApiKey(apiKey)
                 .map(userMapper::toDto)
-                .orElseThrow(()-> new ApiKeyServiceException(ErrorCodesEnum.USER_NOT_FOUND));
+                .orElseThrow(() -> new ApiKeyServiceException(ErrorCodesEnum.USER_NOT_FOUND));
     }
 
-    public ApiKeyDto getUserApiKey(String username){
+    public ApiKeyDto getUserApiKey(String username) {
         return new ApiKeyDto(getUser(username).getApiKey());
     }
-
 
 
     private String generateUniqueApiKey() {
@@ -65,7 +64,7 @@ public class ApiKeyService {
             }
         }
 
-        throw new ApiKeyServiceException(ErrorCodesEnum.UNLUCKY_ERROR,"Failed to generate unique API key after " + maxAttempts + " attempts");
+        throw new ApiKeyServiceException(ErrorCodesEnum.UNLUCKY_ERROR, "Failed to generate unique API key after " + maxAttempts + " attempts");
     }
 
     private String generateApiKey() {

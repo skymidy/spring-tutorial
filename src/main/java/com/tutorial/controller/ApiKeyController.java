@@ -27,10 +27,10 @@ public class ApiKeyController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/me")
-    public ApiKeyDto generateNewApiKey(@AuthenticationPrincipal UserDetails userDetails){
+    public ApiKeyDto generateNewApiKey(@AuthenticationPrincipal UserDetails userDetails) {
         return apiKeyService.generateApiKeyForUser(userDetails.getUsername());
     }
-    
+
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/key")
@@ -48,7 +48,7 @@ public class ApiKeyController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/user/{username}")
-    public ApiKeyDto generateNewApiKeyForUser(@RequestBody UsernameDto usernameDto){
+    public ApiKeyDto generateNewApiKeyForUser(@RequestBody UsernameDto usernameDto) {
         return apiKeyService.generateApiKeyForUser(usernameDto.getUsername());
     }
 

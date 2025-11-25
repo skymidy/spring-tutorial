@@ -8,7 +8,8 @@ import com.tutorial.model.entity.AuthenticationType;
 
 @Mapper(componentModel = "spring")
 public interface AuthenticationTypeMapper {
-  AuthenticationTypeDto toDto(AuthenticationType entity);
-  @Mapping(target = "id", ignore = true)
-  AuthenticationType toEntity(AuthenticationTypeDto dto);
+    AuthenticationTypeDto toDto(AuthenticationType entity);
+
+    @Mapping(target = "id", ignore = true)
+    AuthenticationType toEntity(AuthenticationTypeDto dto);
 }

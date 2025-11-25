@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface RequestLogRepository extends Repository<RequestLog, Integer> {
     RequestLog save(RequestLog log);
+
     Optional<RequestLog> findById(Integer id);
 }

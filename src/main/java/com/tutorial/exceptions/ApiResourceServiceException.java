@@ -6,6 +6,7 @@ public class ApiResourceServiceException extends BaseServiceException {
     public ApiResourceServiceException(ErrorCodesEnum code, String message) {
         super(code, message);
     }
+
     public ApiResourceServiceException(ErrorCodesEnum code) {
         super(code);
     }

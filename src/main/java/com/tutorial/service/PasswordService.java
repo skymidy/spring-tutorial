@@ -22,8 +22,7 @@ public class PasswordService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public PasswordService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder)
-    {
+    public PasswordService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
@@ -42,7 +41,7 @@ public class PasswordService {
                         () -> new PasswordServiceException(ErrorCodesEnum.USER_NOT_FOUND)
                 );
 
-        if(passwordEncoder.matches(passwordDto.getPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(passwordDto.getPassword(), user.getPassword())) {
             throw new PasswordServiceException(ErrorCodesEnum.UNACCEPTABLE_PASSWORD, "New password must be different from the current password");
         }
 

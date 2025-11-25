@@ -19,13 +19,13 @@ public class RateLimitService {
         this.userMapper = userMapper;
     }
 
-    public UserDto updateUserRateLimit(String username, Long rateLimit){
+    public UserDto updateUserRateLimit(String username, Long rateLimit) {
 
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new RateLimitServiceException(ErrorCodesEnum.USER_NOT_FOUND));
 
-        if(rateLimit <= 0) {
+        if (rateLimit <= 0) {
             throw new RateLimitServiceException(ErrorCodesEnum.UNACCEPTABLE_RATE_LIMIT_VALUE, "RateLimit value zer or below unacceptable");
         }
 

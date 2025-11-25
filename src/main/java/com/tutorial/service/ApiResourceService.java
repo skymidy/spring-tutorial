@@ -35,19 +35,20 @@ public class ApiResourceService {
         return apiResourceMapper.toDto(
                 apiResourceRepository.findById(id).orElseThrow(() ->
                         new ApiResourceServiceException(ErrorCodesEnum.API_RESOURCE_NOT_FOUND
-                )));
+                        )));
     }
 
     public ApiResourceDto findByAlias(String apiAlias) {
         return apiResourceMapper.toDto(
                 apiResourceRepository.findByName(apiAlias).orElseThrow(() ->
                         new ApiResourceServiceException(ErrorCodesEnum.API_RESOURCE_NOT_FOUND
-                )));
+                        )));
     }
 
     public Set<ApiResourceDto> getAllResources() {
         return apiResourceMapper.toDtoSet(apiResourceRepository.findAll());
     }
+
     public Set<ApiResourceDto> getAllEnabledResources() {
         return apiResourceMapper.toDtoSet(apiResourceRepository.findAllByIsEnabledTrue());
     }

@@ -21,14 +21,14 @@ public class RateLimitController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/me")
-    public RateLimitDto getRateLimit(@AuthenticationPrincipal UserDetails userDetails){
+    public RateLimitDto getRateLimit(@AuthenticationPrincipal UserDetails userDetails) {
         return rateLimitService.getUserRateLimit(userDetails.getUsername());
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RateLimitDto getUserRateLimit(@PathVariable("username") String username){
+    public RateLimitDto getUserRateLimit(@PathVariable("username") String username) {
         return rateLimitService.getUserRateLimit(username);
     }
 

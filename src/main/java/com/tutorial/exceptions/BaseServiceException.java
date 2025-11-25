@@ -4,7 +4,7 @@ import com.tutorial.Enum.ErrorCodesEnum;
 import lombok.Getter;
 
 @Getter
-public abstract class BaseServiceException extends RuntimeException{
+public abstract class BaseServiceException extends RuntimeException {
 
     private final ErrorCodesEnum code;
 
@@ -12,6 +12,7 @@ public abstract class BaseServiceException extends RuntimeException{
         super(message);
         this.code = code;
     }
+
     public BaseServiceException(ErrorCodesEnum code) {
         super(code.getMessage());
         this.code = code;

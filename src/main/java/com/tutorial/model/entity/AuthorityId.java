@@ -13,6 +13,6 @@ import com.tutorial.Enum.AuthorityEnum;
 @AllArgsConstructor
 public class AuthorityId implements Serializable {
 
-  private String username;
-  private AuthorityEnum authority;
+    private String username;
+    private AuthorityEnum authority;
 }

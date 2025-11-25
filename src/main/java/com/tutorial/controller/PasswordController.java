@@ -23,14 +23,14 @@ public class PasswordController {
     @PostMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public UserDto updatePassword(@PathVariable("username") String username,
-                                  @RequestBody PasswordDto passwordDto){
+                                  @RequestBody PasswordDto passwordDto) {
         return passwordService.updatePassword(username, passwordDto);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/me")
     public UserDto updatePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                  @RequestBody PasswordDto passwordDto){
+                                  @RequestBody PasswordDto passwordDto) {
         return passwordService.updatePassword(userDetails.getUsername(), passwordDto);
     }
 }
