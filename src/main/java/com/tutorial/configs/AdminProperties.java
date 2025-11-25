@@ -1,4 +1,4 @@
-package com.tutorial.security;
+package com.tutorial.configs;
 
 import com.tutorial.Enum.AuthorityEnum;
 import lombok.Data;
