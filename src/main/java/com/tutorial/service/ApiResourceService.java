@@ -14,17 +14,23 @@ import java.util.Set;
 public class ApiResourceService {
 
     private final ApiResourceRepository apiResourceRepository;
+    private final ApiKeyService apiKeyService;
     private final ApiResourceMapper apiResourceMapper;
 
-    public ApiResourceService(ApiResourceRepository apiResourceRepository,
+    public ApiResourceService(ApiResourceRepository apiResourceRepository, ApiKeyService apiKeyService,
                               ApiResourceMapper apiResourceMapper) {
         this.apiResourceRepository = apiResourceRepository;
+        this.apiKeyService = apiKeyService;
         this.apiResourceMapper = apiResourceMapper;
     }
 
     public ApiResourceDto create(ApiResourceDto apiResourceDto) {
 
         ApiResource newApiResource = apiResourceMapper.toEntity(apiResourceDto);
+
+        if(newApiResource.getApiKey() == null){
+            newApiResource.setApiKey(apiKeyService.generateApiKey());
+        }
 
         newApiResource.setIsEnabled(false);
 
@@ -78,7 +84,6 @@ public class ApiResourceService {
         if (dto.getName() != null) entity.setName(dto.getName());
         if (dto.getBaseUrl() != null) entity.setBaseUrl(dto.getBaseUrl());
         if (dto.getIsEnabled() != null) entity.setIsEnabled(dto.getIsEnabled());
-        if (dto.getApiKey() != null) entity.setApiKey(dto.getApiKey());
 
         return apiResourceMapper.toDto(apiResourceRepository.save(entity));
     }
