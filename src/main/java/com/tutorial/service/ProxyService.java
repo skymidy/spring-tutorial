@@ -8,6 +8,7 @@ import com.tutorial.repository.ApiResourceRepository;
 import com.tutorial.repository.RequestLogRepository;
 import com.tutorial.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,13 +22,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashSet;
 
 import org.springframework.lang.Nullable;
-import reactor.util.function.Tuple2;
 
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
@@ -45,6 +47,7 @@ public class ProxyService {
     private static final String TARGET_AUTH_HEADER = "X-Target-Auth";
 
     private static final Set<String> HOP_BY_HOP_HEADERS;
+    public static final int CACHE_TTL_SECONDS = 60;
 
     static {
         Set<String> s = new HashSet<>();
@@ -58,14 +61,24 @@ public class ProxyService {
     private final RequestLogRepository requestLogRepository;
     private final WebClient webClient;
     private final AntPathMatcher pathMatcher;
-    private final UserRepository userRepository;
 
-    public ProxyService(ApiResourceRepository apiResourceRepository, RequestLogRepository requestLogRepository, WebClient webClient, AntPathMatcher pathMatcher, UserRepository userRepository) {
+    private final UserRepository userRepository;
+    private final RedisTemplate<String, ResponseEntity<byte[]>> redisTemplate;
+    ;
+
+    public ProxyService(
+            ApiResourceRepository apiResourceRepository,
+            RequestLogRepository requestLogRepository,
+            WebClient webClient,
+            AntPathMatcher pathMatcher,
+            UserRepository userRepository,
+            RedisTemplate<String, ResponseEntity<byte[]>> redisTemplate) {
         this.apiResourceRepository = apiResourceRepository;
         this.requestLogRepository = requestLogRepository;
         this.webClient = webClient;
         this.pathMatcher = pathMatcher;
         this.userRepository = userRepository;
+        this.redisTemplate = redisTemplate;
     }
 
 
@@ -109,10 +122,27 @@ public class ProxyService {
         requestLog.setHttpMethod(method.name());
         requestLog.setEndpoint(targetPath);
 
+        String cacheKey = generateCacheKey(method, targetUrl, body);
+        boolean shouldCacheRequest = shouldCacheRequest(method);
+        if (shouldCacheRequest) {
+            ResponseEntity<byte[]> cachedResponse = redisTemplate.opsForValue().getAndExpire(cacheKey, Duration.ofSeconds(CACHE_TTL_SECONDS));
+            if (cachedResponse != null) {
 
-        //Proxy request execution chain
-        return webClient
-                .method(method)
+                String hitsHeaderValue = cachedResponse.getHeaders().getFirst("X-Cache-Hits");
+                int hitsValue = Integer.parseInt(hitsHeaderValue != null ? hitsHeaderValue : "0");
+                cachedResponse.getHeaders().set("X-Cache-Hits", String.format("%d", hitsValue + 1));
+
+                // TODO: Maybe set to container name or set server name in settings
+                cachedResponse.getHeaders().set("X-Served-By", "It's me mario!!");
+
+                return Mono.just(ResponseEntity.status(cachedResponse.getStatusCode())
+                                .headers(cachedResponse.getHeaders())
+                                .body(cachedResponse.getBody()))
+                        .flatMap(responseEntity -> finalizeLogging(responseEntity, requestLog, startTime));
+            }
+        }
+
+        return webClient.method(method)
                 .uri(targetUrl)
                 .headers(httpHeaders -> httpHeaders.addAll(forwardHeaders))
                 .body(BodyInserters.fromValue(body != null ? body : new byte[0]))
@@ -121,9 +151,26 @@ public class ProxyService {
                 .map(this::normalizeSuccessfulResponse)
                 .onErrorResume(WebClientResponseException.class, this::handleTargetServiceError)
                 .onErrorResume(IOException.class, this::handleNetworkError)
-                .elapsed()
-                .flatMap(tuple -> finalizeLogging(tuple, requestLog, startTime))
+                .map(responseEntity -> cacheResult(responseEntity, cacheKey, shouldCacheRequest))
+                .flatMap(responseEntity -> finalizeLogging(responseEntity, requestLog, startTime))
                 .onErrorResume(Mono::error);
+    }
+
+    private ResponseEntity<byte[]> cacheResult(
+            ResponseEntity<byte[]> responseEntity,
+            String cacheKey,
+            boolean shouldCacheRequest
+    ) {
+
+        if (responseEntity.getStatusCode().is2xxSuccessful() && shouldCacheRequest) {
+            ResponseEntity<byte[]> toCacheResponseEntity = new ResponseEntity<byte[]>(responseEntity.getBody(), responseEntity.getHeaders(), responseEntity.getStatusCode());
+            toCacheResponseEntity.getHeaders().add("X-Cache", "HIT");
+            toCacheResponseEntity.getHeaders().add("X-Cache-Hits", "0");
+
+            redisTemplate.opsForValue()
+                    .set(cacheKey, responseEntity, Duration.ofSeconds(CACHE_TTL_SECONDS));
+        }
+        return responseEntity;
     }
 
     private ResponseEntity<byte[]> normalizeSuccessfulResponse(ResponseEntity<byte[]> proxyResponse) {
@@ -147,19 +194,18 @@ public class ProxyService {
     }
 
     private Mono<ResponseEntity<byte[]>> finalizeLogging(
-            Tuple2<Long, ResponseEntity<byte[]>> tuple,
+            ResponseEntity<byte[]> responseEntity,
             RequestLog requestLog,
             long startTime
     ) {
-        ResponseEntity<byte[]> response = tuple.getT2();
-        long durationNanos = tuple.getT1() + (System.nanoTime() - startTime);
+        long durationNanos = System.nanoTime() - startTime;
         double durationMs = durationNanos / 1_000_000.0;
 
         requestLog.setResponseTimeMs(Math.round(durationMs));
-        requestLog.setResponseStatus(response.getStatusCode().value());
+        requestLog.setResponseStatus(responseEntity.getStatusCode().value());
         requestLog.setResponseBodyType(
-                response.hasBody() && response.getHeaders().getContentType() != null
-                        ? response.getHeaders().getContentType().toString()
+                responseEntity.hasBody() && responseEntity.getHeaders().getContentType() != null
+                        ? responseEntity.getHeaders().getContentType().toString()
                         : "none"
         );
 
@@ -169,9 +215,9 @@ public class ProxyService {
             throw new ProxyServiceException(ErrorCodesEnum.DB_ERROR, String.format("Logging failed but proxy succeeded: %s - %s", requestLog.getEndpoint(), ex.getMessage()));
         }
 
-        return Mono.just(ResponseEntity.status(response.getStatusCode())
-                .headers(response.getHeaders())
-                .body(response.getBody()));
+        return Mono.just(ResponseEntity.status(responseEntity.getStatusCode())
+                .headers(responseEntity.getHeaders())
+                .body(responseEntity.getBody()));
     }
 
     private void addForwardHeaders(HttpHeaders headers, ServerHttpRequest request) {
@@ -251,5 +297,23 @@ public class ProxyService {
         }
         // TODO: OWASP Java
         return queryString;
+    }
+
+    private boolean shouldCacheRequest(HttpMethod method) {
+        return method == HttpMethod.GET;
+    }
+
+    private String generateCacheKey(HttpMethod method, String targetUrl, @Nullable byte[] body) {
+        StringBuilder key = new StringBuilder("cache:")
+                .append(method.name())
+                .append(":")
+                .append(targetUrl.replace("/", "_"));
+
+        // Only include body for requests with small payloads
+        if (body != null && body.length > 0 && body.length < 1024) {
+            String bodyHash = Base64.getEncoder().encodeToString(body);
+            key.append(":b64:").append(bodyHash, 0, Math.min(16, bodyHash.length()));
+        }
+        return key.toString();
     }
 }
