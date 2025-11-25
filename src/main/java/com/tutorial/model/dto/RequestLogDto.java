@@ -16,4 +16,5 @@ public class RequestLogDto {
     private Integer responseStatus;
     private Long responseTimeMs;
     private String responseBodyType;
+    private boolean loadedFromCache;
 }

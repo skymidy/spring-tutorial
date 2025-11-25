@@ -57,4 +57,6 @@ public class RequestLog {
     @Column(length = 50)
     private String responseBodyType;
 
+    @Column(name = "loaded_from_cache", nullable = false)
+    private Boolean loadedFromCache = false;
 }
