@@ -43,4 +43,7 @@ public class ApiResource {
     @NonNull
     @Column(length = 32)
     private String apiKey;
+
+    @Column(length = 255, nullable = true)
+    private String targetAuthHeader;
 }
