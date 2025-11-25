@@ -2,9 +2,9 @@ package com.tutorial.repository;
 
 import com.tutorial.model.entity.User;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -20,5 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByApiKey(String apiKey);
 
+    @EntityGraph(attributePaths = "authorities")
     Optional<User> findByApiKey(String apiKey);
 }

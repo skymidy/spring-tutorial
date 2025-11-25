@@ -2,7 +2,7 @@ package com.tutorial.security;
 
 import com.tutorial.configs.AdminProperties;
 import com.tutorial.mapper.AuthorityMapper;
-import com.tutorial.model.dto.AuthorityDto;
+import com.tutorial.model.dto.AuthoritiesDto;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.AuthorityRepository;
 import com.tutorial.repository.UserRepository;
@@ -65,7 +65,7 @@ public class TempAdminSetupService {
         authorityRepository.saveAll(
                 authorityMapper.toEntitySet(
                         tempAdmin.getUsername(),
-                        new AuthorityDto(adminProperties.getAuthorities().stream().map(Enum::toString).collect(Collectors.toSet()))));
+                        new AuthoritiesDto(adminProperties.getAuthorities().stream().map(Enum::toString).collect(Collectors.toSet()))));
 
         log.info("Temporary admin created: {} with authority: {})",
                 adminProperties.getUsername(), adminProperties.getAuthorities().toString());

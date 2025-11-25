@@ -1,6 +1,5 @@
 package com.tutorial.model.dto;
 
-import com.tutorial.Enum.AuthorityEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,6 +7,6 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class AuthorityDto {
+public class AuthoritiesDto {
     private Set<String> authorities;
 }

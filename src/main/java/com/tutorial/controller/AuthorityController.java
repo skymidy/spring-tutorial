@@ -1,7 +1,6 @@
 package com.tutorial.controller;
 
-import com.tutorial.model.dto.AuthorityDto;
-import com.tutorial.model.dto.UsernameDto;
+import com.tutorial.model.dto.AuthoritiesDto;
 import com.tutorial.service.AuthorityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,8 +47,8 @@ public class AuthorityController {
     @PostMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> assignAuthoritiesToUser(@PathVariable("username") String username,
-                                               @RequestBody AuthorityDto authorityDto) {
-        return authorityService.assignAuthorityToUser(username, authorityDto);
+                                               @RequestBody AuthoritiesDto authoritiesDto) {
+        return authorityService.assignAuthorityToUser(username, authoritiesDto);
     }
 
 
@@ -57,8 +56,8 @@ public class AuthorityController {
     @DeleteMapping("/user/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Set<String> removeAuthoritiesFromUser(@PathVariable("username") String username,
-                                                 @RequestBody AuthorityDto authorityDto) {
-        return authorityService.removeAuthorityFromUser(username, authorityDto);
+                                                 @RequestBody AuthoritiesDto authoritiesDto) {
+        return authorityService.removeAuthorityFromUser(username, authoritiesDto);
     }
 
 }

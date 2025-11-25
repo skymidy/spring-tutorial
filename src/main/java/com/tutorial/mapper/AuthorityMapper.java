@@ -1,7 +1,7 @@
 package com.tutorial.mapper;
 
 import com.tutorial.Enum.AuthorityEnum;
-import com.tutorial.model.dto.AuthorityDto;
+import com.tutorial.model.dto.AuthoritiesDto;
 import com.tutorial.model.entity.Authority;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,7 +22,7 @@ public interface AuthorityMapper {
 
 
 
-    default Set<Authority> toEntitySet(String username, AuthorityDto dto) {
+    default Set<Authority> toEntitySet(String username, AuthoritiesDto dto) {
         if (dto == null || dto.getAuthorities() == null) {
             return Set.of();
         }

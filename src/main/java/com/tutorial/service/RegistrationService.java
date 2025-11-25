@@ -5,7 +5,7 @@ import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.exceptions.RegistrationServiceException;
 import com.tutorial.mapper.AuthorityMapper;
 import com.tutorial.mapper.UserMapper;
-import com.tutorial.model.dto.AuthorityDto;
+import com.tutorial.model.dto.AuthoritiesDto;
 import com.tutorial.model.dto.RegistrationRequestDto;
 import com.tutorial.model.dto.UserDto;
 import com.tutorial.model.entity.User;
@@ -62,7 +62,7 @@ public class RegistrationService {
         authorityRepository.saveAll(
                 authorityMapper.toEntitySet(
                         saved.getUsername(),
-                        new AuthorityDto(BASE_USER_AUTHORITIES.stream().map(Enum::name).collect(Collectors.toSet()))
+                        new AuthoritiesDto(BASE_USER_AUTHORITIES.stream().map(Enum::name).collect(Collectors.toSet()))
                 )
         );
 

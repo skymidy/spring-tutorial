@@ -5,7 +5,7 @@ import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.configs.DBProperties;
 import com.tutorial.exceptions.AuthorityServiceException;
 import com.tutorial.mapper.AuthorityMapper;
-import com.tutorial.model.dto.AuthorityDto;
+import com.tutorial.model.dto.AuthoritiesDto;
 import com.tutorial.model.entity.Authority;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.AuthorityRepository;
@@ -46,21 +46,21 @@ public class AuthorityService {
     }
 
 
-    public Set<String> assignAuthorityToUser(String username, AuthorityDto authorityDto) {
+    public Set<String> assignAuthorityToUser(String username, AuthoritiesDto authoritiesDto) {
 
         usernameCheck(username);
 
-        authorityRepository.saveAll(getAuthorities(username, authorityDto));
+        authorityRepository.saveAll(getAuthorities(username, authoritiesDto));
 
         return authorityRepository.findAllByUsername(username).stream()
                 .map(Enum::name)
                 .collect(Collectors.toSet());
     }
 
-    public Set<String> removeAuthorityFromUser(String username, AuthorityDto authorityDto) {
+    public Set<String> removeAuthorityFromUser(String username, AuthoritiesDto authoritiesDto) {
         usernameCheck(username);
 
-        Set<AuthorityEnum> authorities = authorityDto.getAuthorities().stream().map(AuthorityEnum::valueOf).collect(Collectors.toSet());
+        Set<AuthorityEnum> authorities = authoritiesDto.getAuthorities().stream().map(AuthorityEnum::valueOf).collect(Collectors.toSet());
 
         if (authorityRepository.removeAuthoritiesFromUser(username, authorities) == 0) {
             //TODO: Add custom error code
@@ -72,15 +72,15 @@ public class AuthorityService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Authority> getAuthorities(String username, AuthorityDto authorityDto) {
-        if (authorityDto.getAuthorities().size() > dbProperties.getBatch_size()) {
+    private Set<Authority> getAuthorities(String username, AuthoritiesDto authoritiesDto) {
+        if (authoritiesDto.getAuthorities().size() > dbProperties.getBatch_size()) {
             throw new AuthorityServiceException(ErrorCodesEnum.UNACCEPTABLE_AUTHORITY,
                     "Too many authorities (%d) > batchSize(%d)"
-                            .formatted(authorityDto.getAuthorities().size(), dbProperties.getBatch_size()));
+                            .formatted(authoritiesDto.getAuthorities().size(), dbProperties.getBatch_size()));
         }
 
         try {
-            return authorityMapper.toEntitySet(username, authorityDto);
+            return authorityMapper.toEntitySet(username, authoritiesDto);
         } catch (IllegalArgumentException e) {
             throw new AuthorityServiceException(ErrorCodesEnum.UNACCEPTABLE_AUTHORITY, ErrorCodesEnum.UNACCEPTABLE_AUTHORITY.getMessage());
         }
