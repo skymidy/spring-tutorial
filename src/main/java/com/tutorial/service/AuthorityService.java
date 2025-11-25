@@ -39,7 +39,10 @@ public class AuthorityService {
     public Set<String> getAllUserAuthorities(String username) {
         usernameCheck(username);
 
-        return authorityRepository.findAllByUsername(username);
+        // repository returns AuthorityEnum values; convert to String names for API
+        return authorityRepository.findAllByUsername(username).stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
     }
 
 
@@ -49,7 +52,9 @@ public class AuthorityService {
 
         authorityRepository.saveAll(getAuthorities(username, authorityDto));
 
-        return authorityRepository.findAllByUsername(username);
+        return authorityRepository.findAllByUsername(username).stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
     }
 
     public Set<String> removeAuthorityFromUser(String username, AuthorityDto authorityDto) {
@@ -62,7 +67,9 @@ public class AuthorityService {
             throw new AuthorityServiceException(ErrorCodesEnum.DB_ERROR, ErrorCodesEnum.DB_ERROR.getMessage());
         }
 
-        return authorityRepository.findAllByUsername(username);
+        return authorityRepository.findAllByUsername(username).stream()
+                .map(Enum::name)
+                .collect(Collectors.toSet());
     }
 
     private Set<Authority> getAuthorities(String username, AuthorityDto authorityDto) {
