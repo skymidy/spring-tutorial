@@ -20,7 +20,7 @@ public class CacheController {
     @PostMapping(value = "/clear")
     @PreAuthorize("hasAuthority('ADMIN')")
     public CacheDto clearCache() {
-        return cacheService.clearCache().block();
+        return cacheService.clearCache();
     }
 
     @ResponseStatus(HttpStatus.OK)

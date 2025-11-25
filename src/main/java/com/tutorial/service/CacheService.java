@@ -5,7 +5,7 @@ import com.tutorial.model.dto.CachedHttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -15,21 +15,21 @@ import java.util.Properties;
 @Slf4j
 public class CacheService {
 
-    private final ReactiveRedisTemplate<String, CachedHttpResponse> reactiveRedisTemplate;
+    private final RedisTemplate<String, CachedHttpResponse> redisTemplate;
     private final ReactiveRedisConnectionFactory connectionFactory;
 
     public CacheService(
             @Qualifier("cachedResponseTemplate")
-            ReactiveRedisTemplate<String, CachedHttpResponse> reactiveRedisTemplate,
+            RedisTemplate<String, CachedHttpResponse> redisTemplate,
             ReactiveRedisConnectionFactory connectionFactory) {
-        this.reactiveRedisTemplate = reactiveRedisTemplate;
+        this.redisTemplate = redisTemplate;
         this.connectionFactory = connectionFactory;
     }
 
-    public Mono<CacheDto> clearCache(){
-        return reactiveRedisTemplate.keys("cache:*")
-                .map(reactiveRedisTemplate::delete)
-                .then(getRedisMemoryUsage());
+    public CacheDto clearCache(){
+        CacheDto cacheDto = getRedisMemoryUsage().block();
+        redisTemplate.keys("cache:*").forEach(redisTemplate::delete);
+        return cacheDto;
     }
 
     public Mono<CacheDto> getRedisMemoryUsage() {
