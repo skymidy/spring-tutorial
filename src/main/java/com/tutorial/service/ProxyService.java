@@ -2,12 +2,15 @@ package com.tutorial.service;
 
 import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.exceptions.ProxyServiceException;
+import com.tutorial.mapper.HttpResponseMapper;
+import com.tutorial.model.dto.CachedHttpResponse;
 import com.tutorial.model.entity.ApiResource;
 import com.tutorial.model.entity.RequestLog;
 import com.tutorial.repository.ApiResourceRepository;
 import com.tutorial.repository.RequestLogRepository;
 import com.tutorial.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -61,10 +64,11 @@ public class ProxyService {
     private final RequestLogRepository requestLogRepository;
     private final WebClient webClient;
     private final AntPathMatcher pathMatcher;
-
     private final UserRepository userRepository;
-    private final RedisTemplate<String, ResponseEntity<byte[]>> redisTemplate;
-    ;
+    private final RedisTemplate<String, CachedHttpResponse> redisCacheTemplate;
+    private final RedisTemplate<String, Long> redisRateLimitTemplate;
+    private final HttpResponseMapper httpResponseMapper;
+
 
     public ProxyService(
             ApiResourceRepository apiResourceRepository,
@@ -72,13 +76,19 @@ public class ProxyService {
             WebClient webClient,
             AntPathMatcher pathMatcher,
             UserRepository userRepository,
-            RedisTemplate<String, ResponseEntity<byte[]>> redisTemplate) {
+            @Qualifier("cachedResponseTemplate")
+            RedisTemplate<String, CachedHttpResponse> redisCacheTemplate,
+            @Qualifier("rateLimitTemplate")
+            RedisTemplate<String, Long> redisRateLimitTemplate,
+            HttpResponseMapper httpResponseMapper) {
         this.apiResourceRepository = apiResourceRepository;
         this.requestLogRepository = requestLogRepository;
         this.webClient = webClient;
         this.pathMatcher = pathMatcher;
         this.userRepository = userRepository;
-        this.redisTemplate = redisTemplate;
+        this.redisCacheTemplate = redisCacheTemplate;
+        this.redisRateLimitTemplate = redisRateLimitTemplate;
+        this.httpResponseMapper = httpResponseMapper;
     }
 
 
@@ -121,11 +131,10 @@ public class ProxyService {
         requestLog.setAuthenticationType(resource.getAuthenticationType());
         requestLog.setHttpMethod(method.name());
         requestLog.setEndpoint(targetPath);
-
         String cacheKey = generateCacheKey(method, targetUrl, body);
         boolean shouldCacheRequest = shouldCacheRequest(method);
         if (shouldCacheRequest) {
-            ResponseEntity<byte[]> cachedResponse = redisTemplate.opsForValue().getAndExpire(cacheKey, Duration.ofSeconds(CACHE_TTL_SECONDS));
+            ResponseEntity<byte[]> cachedResponse = httpResponseMapper.toResponseEntity(redisCacheTemplate.opsForValue().getAndExpire(cacheKey, Duration.ofSeconds(CACHE_TTL_SECONDS)));
             if (cachedResponse != null) {
 
                 String hitsHeaderValue = cachedResponse.getHeaders().getFirst("X-Cache-Hits");
@@ -133,7 +142,7 @@ public class ProxyService {
                 cachedResponse.getHeaders().set("X-Cache-Hits", String.format("%d", hitsValue + 1));
 
                 // TODO: Maybe set to container name or set server name in settings
-                cachedResponse.getHeaders().set("X-Served-By", "It's me mario!!");
+                cachedResponse.getHeaders().set("X-Served-By", "It's me, Mario!!");
 
                 return Mono.just(ResponseEntity.status(cachedResponse.getStatusCode())
                                 .headers(cachedResponse.getHeaders())
@@ -167,8 +176,8 @@ public class ProxyService {
             toCacheResponseEntity.getHeaders().add("X-Cache", "HIT");
             toCacheResponseEntity.getHeaders().add("X-Cache-Hits", "0");
 
-            redisTemplate.opsForValue()
-                    .set(cacheKey, responseEntity, Duration.ofSeconds(CACHE_TTL_SECONDS));
+            redisCacheTemplate.opsForValue()
+                    .set(cacheKey, httpResponseMapper.toDto(responseEntity), Duration.ofSeconds(CACHE_TTL_SECONDS));
         }
         return responseEntity;
     }

@@ -9,8 +9,8 @@ import com.tutorial.model.dto.CachedHttpResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.*;
 
 import java.io.IOException;
@@ -18,49 +18,57 @@ import java.io.IOException;
 @Configuration
 public class RedisConfig {
 
-    // Template for caching HTTP responses (JSON)
     @Bean
     @Qualifier("cachedResponseTemplate")
-    public ReactiveRedisTemplate<String, CachedHttpResponse> cachedResponseTemplate(
-            ReactiveRedisConnectionFactory factory) {
+    public RedisTemplate<String, CachedHttpResponse> cachedResponseTemplate(
+            RedisConnectionFactory factory) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.activateDefaultTyping(
                 mapper.getPolymorphicTypeValidator(),
                 ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY);
+                JsonTypeInfo.As.PROPERTY
+        );
         mapper.registerModule(new SimpleModule()
                 .addSerializer(byte[].class, new ByteArraySerializer())
-                .addDeserializer(byte[].class, new ByteArrayDeserializer()));
+                .addDeserializer(byte[].class, new ByteArrayDeserializer())
+        );
 
         Jackson2JsonRedisSerializer<CachedHttpResponse> serializer =
                 new Jackson2JsonRedisSerializer<>(mapper, CachedHttpResponse.class);
 
-        RedisSerializationContext<String, CachedHttpResponse> context =
-                RedisSerializationContext.<String, CachedHttpResponse>newSerializationContext()
-                        .key(StringRedisSerializer.UTF_8)
-                        .value(serializer)
-                        .hashKey(StringRedisSerializer.UTF_8)
-                        .hashValue(serializer)
-                        .build();
+        RedisTemplate<String, CachedHttpResponse> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
 
-        return new ReactiveRedisTemplate<>(factory, context);
+        template.setKeySerializer(StringRedisSerializer.UTF_8);
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(StringRedisSerializer.UTF_8);
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
     }
 
     @Bean
     @Qualifier("rateLimitTemplate")
-    ReactiveRedisTemplate<String, Long> reactiveRedisTemplate(ReactiveRedisConnectionFactory factory) {
+    public RedisTemplate<String, Long> rateLimitTemplate(RedisConnectionFactory factory) {
 
-        JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
+        RedisTemplate<String, Long> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
 
-        StringRedisSerializer stringRedisSerializer = StringRedisSerializer.UTF_8;
+        // Keys
+        template.setKeySerializer(StringRedisSerializer.UTF_8);
+        template.setHashKeySerializer(StringRedisSerializer.UTF_8);
 
-        GenericToStringSerializer<Long> longToStringSerializer = new GenericToStringSerializer<>(Long.class);
+        // Values (Long → String → Redis)
+        GenericToStringSerializer<Long> longToStringSerializer =
+                new GenericToStringSerializer<>(Long.class);
 
-        return new ReactiveRedisTemplate<>(factory,
-                RedisSerializationContext
-                        .<String, Long>newSerializationContext(jdkSerializationRedisSerializer)
-                        .key(stringRedisSerializer).value(longToStringSerializer).build());
+        template.setValueSerializer(longToStringSerializer);
+        template.setHashValueSerializer(longToStringSerializer);
+
+        template.afterPropertiesSet();
+        return template;
     }
 
     // Custom serializers for byte[] in JSON (base64)
