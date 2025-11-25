@@ -16,6 +16,7 @@ public interface ApiResourceMapper {
     @Mapping(source = "authenticationType.name", target = "authenticationTypeName")
     ApiResourceDto toDto(ApiResource entity);
 
+    @Mapping(target = "authenticationType.name", source="authenticationTypeName")
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "id", ignore = true)
     ApiResource toEntity(ApiResourceDto dto);
