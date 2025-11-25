@@ -1,4 +1,4 @@
-package com.tutorial.service;
+package com.tutorial.security;
 
 import java.util.Set;
 
@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

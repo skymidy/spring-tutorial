@@ -1,6 +1,5 @@
-package com.tutorial.service;
+package com.tutorial.security;
 
-import com.tutorial.configs.AdminProperties;
 import com.tutorial.mapper.AuthorityMapper;
 import com.tutorial.model.dto.AuthorityDto;
 import com.tutorial.model.entity.User;
