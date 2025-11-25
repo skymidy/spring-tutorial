@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.AntPathMatcher;
 
 import java.time.Duration;
 
@@ -23,6 +24,11 @@ public class WebClientConfig {
                                 .responseTimeout(Duration.ofSeconds(30))             // 30 sec response
                 ))
                 .build();
+    }
+
+    @Bean
+    public AntPathMatcher antPathMatcher() {
+        return new AntPathMatcher();
     }
 }
 
