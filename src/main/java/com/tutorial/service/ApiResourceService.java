@@ -3,33 +3,49 @@ package com.tutorial.service;
 import com.tutorial.Enum.ErrorCodesEnum;
 import com.tutorial.exceptions.ApiResourceServiceException;
 import com.tutorial.mapper.ApiResourceMapper;
+import com.tutorial.mapper.AuthenticationTypeMapper;
 import com.tutorial.model.dto.ApiResourceDto;
+import com.tutorial.model.dto.AuthenticationTypeDto;
 import com.tutorial.model.entity.ApiResource;
+import com.tutorial.model.entity.AuthenticationType;
 import com.tutorial.repository.ApiResourceRepository;
+import com.tutorial.repository.AuthenticationTypeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class ApiResourceService {
 
     private final ApiResourceRepository apiResourceRepository;
-    private final ApiKeyService apiKeyService;
     private final ApiResourceMapper apiResourceMapper;
+    private final AuthenticationTypeRepository authenticationTypeRepository;
+    private final AuthenticationTypeMapper authenticationTypeMapper;
 
     public ApiResourceService(ApiResourceRepository apiResourceRepository, ApiKeyService apiKeyService,
-                              ApiResourceMapper apiResourceMapper) {
+                              ApiResourceMapper apiResourceMapper, AuthenticationTypeRepository authenticationTypeRepository, AuthenticationTypeMapper authenticationTypeMapper) {
         this.apiResourceRepository = apiResourceRepository;
-        this.apiKeyService = apiKeyService;
         this.apiResourceMapper = apiResourceMapper;
+        this.authenticationTypeRepository = authenticationTypeRepository;
+        this.authenticationTypeMapper = authenticationTypeMapper;
     }
 
+    @Transactional
     public ApiResourceDto create(ApiResourceDto apiResourceDto) {
 
         ApiResource newApiResource = apiResourceMapper.toEntity(apiResourceDto);
 
-        if(newApiResource.getApiKey() == null){
-            newApiResource.setApiKey(apiKeyService.generateApiKey());
+
+        Optional<AuthenticationType> authenticationType = authenticationTypeRepository.findByName(apiResourceDto.getAuthenticationTypeName());
+        if (authenticationType.isEmpty()) {
+            AuthenticationType newAuthenticationType = authenticationTypeRepository.save(
+                    authenticationTypeMapper.toEntity(new AuthenticationTypeDto(apiResourceDto.getAuthenticationTypeName()))
+            );
+            newApiResource.setAuthenticationType(newAuthenticationType);
+        } else {
+            newApiResource.setAuthenticationType(authenticationType.get());
         }
 
         newApiResource.setIsEnabled(false);
@@ -84,6 +100,20 @@ public class ApiResourceService {
         if (dto.getName() != null) entity.setName(dto.getName());
         if (dto.getBaseUrl() != null) entity.setBaseUrl(dto.getBaseUrl());
         if (dto.getIsEnabled() != null) entity.setIsEnabled(dto.getIsEnabled());
+
+        if (dto.getAuthenticationTypeName() != null) {
+            Optional<AuthenticationType> authenticationType = authenticationTypeRepository.findByName(dto.getAuthenticationTypeName());
+            if (authenticationType.isEmpty()) {
+
+                AuthenticationType newAuthenticationType = authenticationTypeRepository.save(
+                        authenticationTypeMapper.toEntity(new AuthenticationTypeDto(dto.getAuthenticationTypeName()))
+                );
+
+                entity.setAuthenticationType(newAuthenticationType);
+            } else {
+                entity.setAuthenticationType(authenticationType.get());
+            }
+        }
 
         return apiResourceMapper.toDto(apiResourceRepository.save(entity));
     }

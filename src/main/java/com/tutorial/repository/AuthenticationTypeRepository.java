@@ -1,12 +1,10 @@
 package com.tutorial.repository;
 
 import com.tutorial.model.entity.AuthenticationType;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface AuthenticationTypeRepository extends Repository<AuthenticationType, Integer> {
-    AuthenticationType save(AuthenticationType type);
-
-    Optional<AuthenticationType> findById(Integer id);
+public interface AuthenticationTypeRepository extends JpaRepository<AuthenticationType, Integer> {
+    Optional<AuthenticationType> findByName(String name);
 }
