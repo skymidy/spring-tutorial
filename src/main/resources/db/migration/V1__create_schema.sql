@@ -17,7 +17,7 @@ CREATE TABLE
         name VARCHAR(255) NOT NULL,
         base_url VARCHAR(255) NOT NULL,
         is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-        api_key VARCHAR(32) NOT NULL
+        api_key VARCHAR(32)
     );
 
 -- Users

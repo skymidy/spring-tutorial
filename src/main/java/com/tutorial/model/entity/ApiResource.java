@@ -40,7 +40,6 @@ public class ApiResource {
     @ColumnDefault("true")
     private Boolean isEnabled = true;
 
-    @NonNull
     @Column(length = 32)
     private String apiKey;
 
