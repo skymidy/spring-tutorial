@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface HttpResponseMapper {
-    HttpResponseMapper INSTANCE = Mappers.getMapper(HttpResponseMapper.class);
 
     default CachedHttpResponse toDto(ResponseEntity<byte[]> response) {
         if (response == null) return null;
