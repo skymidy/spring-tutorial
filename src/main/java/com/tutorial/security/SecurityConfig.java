@@ -29,12 +29,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/register").hasAuthority("ADMIN")
-                        .requestMatchers("/error", "/login/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/error", "/login/**", "/oauth2/**", "/actuator").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())
                 .formLogin(withDefaults())
-//                .oauth2Login(withDefaults())
+//              .oauth2Login(withDefaults())
                 ;
 
         return http.build();
