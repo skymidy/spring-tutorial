@@ -6,8 +6,8 @@ import java.time.OffsetDateTime;
 
 @Data
 public class TimeWindowStatsDto {
-    private OffsetDateTime from;
-    private OffsetDateTime to;
+    private OffsetDateTime fromDateTimeOffset;
+    private OffsetDateTime toDateTimeOffset;
     private Long totalRequests;
     private Double averageResponseTimeMs;
 }

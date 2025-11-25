@@ -20,51 +20,51 @@ public interface RequestLogRepository extends Repository<RequestLog, Integer> {
 
     @Query("""
             SELECT
-            :from AS "from",
-            :to AS "to",
-            count(r) as "totalRequests",
-            avg(r.responseTimeMs) as "averageResponseTimeMs"
+            :fromDateTimeOffset AS fromDateTimeOffset,
+            :toDateTimeOffset AS toDateTimeOffset,
+            count(r) as totalRequests,
+            avg(r.responseTimeMs) as averageResponseTimeMs
             FROM RequestLog r
-            WHERE r.requestTimestamp BETWEEN :from AND :to
+            WHERE r.requestTimestamp BETWEEN :fromDateTimeOffset AND :toDateTimeOffset
             """)
-    TimeWindowStatsDto aggregateStatsInTimeWindow(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to);
+    TimeWindowStatsDto aggregateStatsInTimeWindow(@Param("fromDateTimeOffset") OffsetDateTime from, @Param("toDateTimeOffset") OffsetDateTime to);
 
 
     @Query("""
             SELECT
-            r.apiResource.id as "apiResourceId",
-            r.apiResource.name as "apiResourceName",
-            count(r) as "totalRequests",
-            sum(case when r.httpMethod = 'GET' then 1 else 0 end) as "getRequests",
-            sum(case when r.httpMethod = 'POST' then 1 else 0 end) as "postRequests",
-            sum(case when r.httpMethod = 'PUT' then 1 else 0 end) as "putRequests",
-            sum(case when r.httpMethod = 'DELETE' then 1 else 0 end) as "deleteRequests",
-            avg(r.responseTimeMs) as "averageResponseTimeMs",
-            sum(case when r.responseStatus >= 400 and r.responseStatus < 600 then 1 else 0 end) as "errorCount",
-            sum(case when r.loadedFromCache = true then 1 else 0 end) as "cacheHits"
+            r.apiResource.id as apiResourceId,
+            r.apiResource.name as apiResourceName,
+            count(r) as totalRequests,
+            sum(case when r.httpMethod = 'GET' then 1 else 0 end) as getRequests,
+            sum(case when r.httpMethod = 'POST' then 1 else 0 end) as postRequests,
+            sum(case when r.httpMethod = 'PUT' then 1 else 0 end) as putRequests,
+            sum(case when r.httpMethod = 'DELETE' then 1 else 0 end) as deleteRequests,
+            avg(r.responseTimeMs) as averageResponseTimeMs,
+            sum(case when r.responseStatus >= 400 and r.responseStatus < 600 then 1 else 0 end) as errorCount,
+            sum(case when r.loadedFromCache = true then 1 else 0 end) as cacheHits
             FROM RequestLog r
-            WHERE r.requestTimestamp BETWEEN :from AND :to
+            WHERE r.requestTimestamp BETWEEN :fromDateTimeOffset AND :toDateTimeOffset
             GROUP BY r.apiResource.id
             """)
-    List<ResourceStatsDto> findResourceAggregates(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to);
+    List<ResourceStatsDto> findResourceAggregates(@Param("fromDateTimeOffset") OffsetDateTime from, @Param("toDateTimeOffset") OffsetDateTime to);
 
     @Query("""
             SELECT
-            r.apiResource.id as "apiResourceId",
-            r.apiResource.name as "apiResourceName",
-            count(r) as "totalRequests",
-            sum(case when r.httpMethod = 'GET' then 1 else 0 end) as "getRequests",
-            sum(case when r.httpMethod = 'POST' then 1 else 0 end) as "postRequests",
-            sum(case when r.httpMethod = 'PUT' then 1 else 0 end) as "putRequests",
-            sum(case when r.httpMethod = 'DELETE' then 1 else 0 end) as "deleteRequests",
-            avg(r.responseTimeMs) as "averageResponseTimeMs",
-            sum(case when r.responseStatus >= 400 and r.responseStatus < 600 then 1 else 0 end) as "errorCount",
-            sum(case when r.loadedFromCache = true then 1 else 0 end) as "cacheHits"
+            r.apiResource.id as apiResourceId,
+            r.apiResource.name as apiResourceName,
+            count(r) as totalRequests,
+            sum(case when r.httpMethod = 'GET' then 1 else 0 end) as getRequests,
+            sum(case when r.httpMethod = 'POST' then 1 else 0 end) as postRequests,
+            sum(case when r.httpMethod = 'PUT' then 1 else 0 end) as putRequests,
+            sum(case when r.httpMethod = 'DELETE' then 1 else 0 end) as deleteRequests,
+            avg(r.responseTimeMs) as averageResponseTimeMs,
+            sum(case when r.responseStatus >= 400 and r.responseStatus < 600 then 1 else 0 end) as errorCount,
+            sum(case when r.loadedFromCache = true then 1 else 0 end) as cacheHits
             FROM RequestLog r
-            WHERE r.requestTimestamp BETWEEN :from AND :to AND r.apiResource.name = :alias
+            WHERE r.requestTimestamp BETWEEN :fromDateTimeOffset AND :toDateTimeOffset AND r.apiResource.name = :alias
             GROUP BY r.apiResource.id
             """)
-    List<ResourceStatsDto> findResourceAggregateByAlias(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to, @Param("alias") String alias);
+    List<ResourceStatsDto> findResourceAggregateByAlias(@Param("fromDateTimeOffset") OffsetDateTime from, @Param("toDateTimeOffset") OffsetDateTime to, @Param("alias") String alias);
 
 
     @Query(value = """
@@ -81,15 +81,15 @@ public interface RequestLogRepository extends Repository<RequestLog, Integer> {
         SUM(CASE WHEN r.loaded_from_cache = TRUE THEN 1 ELSE 0 END) AS cacheHits
     FROM request_logs r
     JOIN api_resources ar ON r.api_resource_id = ar.id
-    WHERE r.request_timestamp BETWEEN :from AND :to
+    WHERE r.request_timestamp BETWEEN :fromDateTimeOffset AND :toDateTimeOffset
     GROUP BY ar.id
     ORDER BY totalRequests DESC
-    LIMIT :top
+    LIMIT :topLimit
     """, nativeQuery = true)
     List<ResourceStatsDto> findTopResources(
-            @Param("from") OffsetDateTime from,
-            @Param("to") OffsetDateTime to,
-            @Param("top") int top
+            @Param("fromDateTimeOffset") OffsetDateTime from,
+            @Param("toDateTimeOffset") OffsetDateTime to,
+            @Param("topLimit") int top
     );
 
 
@@ -100,10 +100,10 @@ public interface RequestLogRepository extends Repository<RequestLog, Integer> {
             count(distinct r.apiResource.id) as distinctResourcesUsed,
             avg(r.responseTimeMs) as averageResponseTimeMs
             FROM RequestLog r
-            WHERE r.requestTimestamp BETWEEN :from AND :to
+            WHERE r.requestTimestamp BETWEEN :fromDateTimeOffset AND :toDateTimeOffset
             GROUP BY r.user.username
             """)
-    List<UserStatsDto> findUsersAggregates(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to);
+    List<UserStatsDto> findUsersAggregates(@Param("fromDateTimeOffset") OffsetDateTime from, @Param("toDateTimeOffset") OffsetDateTime to);
 
     @Query("""
             SELECT
@@ -112,9 +112,9 @@ public interface RequestLogRepository extends Repository<RequestLog, Integer> {
             count(distinct r.apiResource.id) as distinctResourcesUsed,
             avg(r.responseTimeMs) as averageResponseTimeMs
             FROM RequestLog r
-            WHERE r.requestTimestamp BETWEEN :from AND :to AND username = user
+                    WHERE r.requestTimestamp BETWEEN :fromDateTimeOffset AND :toDateTimeOffset AND r.user.username = :user
             GROUP BY r.user.username
             """)
-    List<UserStatsDto> findUserAggregates(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to, @Param("user")String username);
+    List<UserStatsDto> findUserAggregates(@Param("fromDateTimeOffset") OffsetDateTime from, @Param("toDateTimeOffset") OffsetDateTime to, @Param("user")String username);
 
 }
