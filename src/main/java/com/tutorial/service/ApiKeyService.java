@@ -67,7 +67,7 @@ public class ApiKeyService {
         throw new ApiKeyServiceException(ErrorCodesEnum.UNLUCKY_ERROR, "Failed to generate unique API key after " + maxAttempts + " attempts");
     }
 
-    private String generateApiKey() {
+    public String generateApiKey() {
         StringBuilder stringBuilder = new StringBuilder(API_KEY_LENGTH);
 
         for (int i = 0; i < API_KEY_LENGTH; i++) {
