@@ -34,7 +34,8 @@ public class SecurityConfig {
                 )
                 .httpBasic(withDefaults())
                 .formLogin(withDefaults())
-                .oauth2Login(withDefaults());
+//                .oauth2Login(withDefaults())
+                ;
 
         return http.build();
     }
