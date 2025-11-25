@@ -13,12 +13,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ApiResourceMapper {
 
-    @Mapping(source = "authenticationType.id", target = "authenticationTypeId")
     @Mapping(source = "authenticationType.name", target = "authenticationTypeName")
     ApiResourceDto toDto(ApiResource entity);
 
     @Mapping(target = "owner", ignore = true)
-    @Mapping(source = "authenticationTypeId", target = "authenticationType.id")
     @Mapping(target = "id", ignore = true)
     ApiResource toEntity(ApiResourceDto dto);
 
