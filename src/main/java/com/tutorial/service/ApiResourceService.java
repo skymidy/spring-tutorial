@@ -35,6 +35,10 @@ public class ApiResourceService {
     @Transactional
     public ApiResourceDto create(ApiResourceDto apiResourceDto) {
 
+        if(apiResourceRepository.findByName(apiResourceDto.getName()).isPresent()){
+            throw new ApiResourceServiceException(ErrorCodesEnum.ALIAS_ALREADY_TAKEN);
+        }
+
         ApiResource newApiResource = apiResourceMapper.toEntity(apiResourceDto);
 
 

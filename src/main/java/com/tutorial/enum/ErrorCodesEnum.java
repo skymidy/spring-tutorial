@@ -20,7 +20,8 @@ public enum ErrorCodesEnum {
     UNACCEPTABLE_RATE_LIMIT_VALUE(HttpStatus.BAD_REQUEST, "Rate limit value  does not meet requirements"),
     INVALID_PATH(HttpStatus.BAD_REQUEST, "Path  does not meet requirements"),
     AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Unsupported authentication type"),
-    RATE_LIMIT_EXCEED(HttpStatus.TOO_MANY_REQUESTS,"Too Many Requests" );
+    RATE_LIMIT_EXCEED(HttpStatus.TOO_MANY_REQUESTS,"Too Many Requests" ),
+    ALIAS_ALREADY_TAKEN(HttpStatus.BAD_REQUEST, "ApiAlias(Name) already taken");
 
     private final HttpStatus httpStatus;
     private final String message;
