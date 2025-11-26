@@ -8,7 +8,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tutorial_user} -d ${POSTGRES_DB:-tutorial_db}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tutorial_user} -d ${POSTGRES_DB:-tutorial_db}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -17,9 +17,9 @@ services:
     image: redis:8.2.3-alpine
     volumes:
       - redis_data:/data
-    command: ["redis-server", "--bind", "0.0.0.0", "--appendonly", "yes"]
+    command: [ "redis-server", "--bind", "0.0.0.0", "--appendonly", "yes" ]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -33,21 +33,29 @@ services:
       redis:
         condition: service_healthy
     environment:
-      - SERVICE_URL_APP
-      - SERVICE_URL_APP_8080
-      - SPRING_DATASOURCE_URL= jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tutorial_db}
-      - SPRING_DATASOURCE_USERNAME= ${POSTGRES_USER:-tutorial_user}
-      - SPRING_DATASOURCE_PASSWORD= ${POSTGRES_PASSWORD:-tutorial_pass}
-      - SPRING_JPA_HIBERNATE_DDL_AUTO= validate
-      - SPRING_DATA_REDIS_HOST= redis
-      - SPRING_DATA_REDIS_PORT= "6379"
-      - APP_TEMP_ADMIN_USERNAME= ${APP_TEMP_ADMIN_USERNAME:-admin}
-      - APP_TEMP_ADMIN_PASSWORD= ${APP_TEMP_ADMIN_PASSWORD:-admin}
+      SERVICE_URL_APP: "${SERVICE_URL_APP}"
+      SERVICE_URL_APP_8080: "${SERVICE_URL_APP_8080}"
+
+      # Postgress
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tutorial_db}"
+      SPRING_DATASOURCE_USERNAME: "${POSTGRES_USER:-tutorial_user}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:-tutorial_pass}"
+
+      # JPA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
+
+      # Redis
+      SPRING_DATA_REDIS_HOST: "redis"
+      SPRING_DATA_REDIS_PORT: "6379"
+
+      # Admin credentials
+      APP_TEMP_ADMIN_USERNAME: "${APP_TEMP_ADMIN_USERNAME:-admin}"
+      APP_TEMP_ADMIN_PASSWORD: "${APP_TEMP_ADMIN_PASSWORD:-admin}"
     ports:
       - "8080"
       - "8000"
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
