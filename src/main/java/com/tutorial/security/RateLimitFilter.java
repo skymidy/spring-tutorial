@@ -1,5 +1,7 @@
 package com.tutorial.security;
 
+import com.tutorial.Enum.AuthorityEnum;
+import com.tutorial.model.entity.Authority;
 import com.tutorial.model.entity.User;
 import com.tutorial.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -14,6 +16,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -66,7 +69,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         // Skip unauthenticated requests and static resources
-        if (auth == null || !auth.isAuthenticated() || isExcludedPath(request)) {
+        if (auth == null || !auth.isAuthenticated() || isExcludedPath(request) || isAdmin(auth)) {
             chain.doFilter(request, response);
             return;
         }
@@ -100,12 +103,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    private boolean isAdmin(Authentication auth) {
+        return auth.getAuthorities().contains(new SimpleGrantedAuthority(AuthorityEnum.ADMIN.name()));
+    }
+
     private boolean isExcludedPath(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.startsWith("/actuator/") ||
-                path.startsWith("/public/") ||
-                path.contains(".") || // Static resources
-                path.startsWith("/login");
+                path.contains(".");
     }
 
     private void handleRateLimitExceeded(HttpServletResponse response, long limit) throws IOException {
