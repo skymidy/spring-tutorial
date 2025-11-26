@@ -65,7 +65,6 @@ public class ProxyService {
     private final AntPathMatcher pathMatcher;
     private final UserRepository userRepository;
     private final RedisTemplate<String, CachedHttpResponse> redisCacheTemplate;
-    private final RedisTemplate<String, Long> redisRateLimitTemplate;
     private final HttpResponseMapper httpResponseMapper;
 
 
@@ -77,8 +76,6 @@ public class ProxyService {
             UserRepository userRepository,
             @Qualifier("cachedResponseTemplate")
             RedisTemplate<String, CachedHttpResponse> redisCacheTemplate,
-            @Qualifier("rateLimitTemplate")
-            RedisTemplate<String, Long> redisRateLimitTemplate,
             HttpResponseMapper httpResponseMapper) {
         this.apiResourceRepository = apiResourceRepository;
         this.requestLogRepository = requestLogRepository;
@@ -86,7 +83,6 @@ public class ProxyService {
         this.pathMatcher = pathMatcher;
         this.userRepository = userRepository;
         this.redisCacheTemplate = redisCacheTemplate;
-        this.redisRateLimitTemplate = redisRateLimitTemplate;
         this.httpResponseMapper = httpResponseMapper;
     }
 
