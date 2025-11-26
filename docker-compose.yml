@@ -33,14 +33,16 @@ services:
       redis:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tutorial_db}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-tutorial_user}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-tutorial_pass}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: "6379"
-      APP_TEMP_ADMIN_USERNAME: ${APP_TEMP_ADMIN_USERNAME:-admin}
-      APP_TEMP_ADMIN_PASSWORD: ${APP_TEMP_ADMIN_PASSWORD:-admin}
+      - SERVICE_URL_APP
+      - SERVICE_URL_APP_8080
+      - SPRING_DATASOURCE_URL= jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tutorial_db}
+      - SPRING_DATASOURCE_USERNAME= ${POSTGRES_USER:-tutorial_user}
+      - SPRING_DATASOURCE_PASSWORD= ${POSTGRES_PASSWORD:-tutorial_pass}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO= validate
+      - SPRING_DATA_REDIS_HOST= redis
+      - SPRING_DATA_REDIS_PORT= "6379"
+      - APP_TEMP_ADMIN_USERNAME= ${APP_TEMP_ADMIN_USERNAME:-admin}
+      - APP_TEMP_ADMIN_PASSWORD= ${APP_TEMP_ADMIN_PASSWORD:-admin}
     ports:
       - "8080"
       - "8000"
