@@ -92,6 +92,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         log.info("User {} requestsMade {}", username, requestsMade);
         if (requestsMade == null || requestsMade == -1 || requestsMade > allowedRequests) {
             handleRateLimitExceeded(response, allowedRequests);
+            return;
         }
 
         // Add standard rate limit headers

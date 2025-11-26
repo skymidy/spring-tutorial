@@ -3,7 +3,9 @@ package com.tutorial.controller.advice;
 import com.tutorial.exceptions.*;
 import com.tutorial.model.dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,8 +54,11 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String message = ex.getMessage();
         log.error("Uncaught Exception! Code: {}, Message: {}", status, message, ex);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
         return ResponseEntity
                 .status(status)
+                .headers(headers)
                 .body(new ErrorResponseDto(status.value(), message));
     }
 
