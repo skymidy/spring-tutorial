@@ -1,9 +1,8 @@
 package com.tutorial.controller;
 
 import com.tutorial.service.ProxyService;
-import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +20,16 @@ public class ProxyController {
     }
 
     @RequestMapping(value = "/{apiAlias}/**")
-    public Mono<ResponseEntity<byte[]>> proxy(
+    public ResponseEntity<byte[]> proxy(
             @PathVariable("apiAlias") String apiAlias,
             @RequestBody(required = false) byte[] body,
             @AuthenticationPrincipal UserDetails userDetails,
-            ServerHttpRequest serverRequest) {
+            HttpServletRequest servletRequest) {
 
         return proxyService.proxyRequest(
                 apiAlias,
                 body,
-                serverRequest,
+                servletRequest,
                 userDetails
         );
     }
